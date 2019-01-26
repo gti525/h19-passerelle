@@ -1,8 +1,11 @@
 import os
 
-from flask import Flask, Blueprint, url_for
+from dotenv import load_dotenv
+from flask import Flask
 from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(os.getenv('APP_SETTINGS'))
@@ -12,6 +15,7 @@ api = Api(app)
 db = SQLAlchemy(app)
 
 from app.routes import main
+
 
 if __name__ == '__main__':
     app.run(debug=True)
