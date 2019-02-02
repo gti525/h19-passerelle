@@ -11,10 +11,13 @@ app = Flask(__name__)
 app.config.from_object(os.getenv('APP_SETTINGS'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-api = Api(app)
+api = Api(app, version='1.0', title='PaymentGateway - API',
+    description='Passerelle de paiement - GTI525:H19',
+)
 db = SQLAlchemy(app)
 
 from app.routes import main
+from app.routes import api
 
 
 if __name__ == '__main__':

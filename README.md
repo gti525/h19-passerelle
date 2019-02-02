@@ -23,3 +23,39 @@ Git
 
 ## Database
 
+````
+# Create the db in the shell
+python
+
+# now you are in the shell
+from app import db
+db.create_all()
+
+# exit the shell
+exit()
+
+# init the database
+python manage.py init
+
+
+# apply the migration
+python manage.py migrate
+
+
+#upgrade the db
+python manage.py upgrade
+
+
+````
+
+## Heroku
+
+```
+#run project heroku
+git push heroku master
+
+
+#run local branch on heroku
+git push heroku branchname:master
+
+```

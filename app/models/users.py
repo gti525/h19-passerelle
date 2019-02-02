@@ -1,13 +1,16 @@
 from app import db
+from app.models.base import TimestampMixin
 
 
-class User(db.Model):
+class User(db.Model,TimestampMixin):
+    """
+
+    """
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
-
     type = db.Column(db.String(50))
 
     def __repr__(self):
@@ -20,6 +23,9 @@ class User(db.Model):
 
 
 class Admin(User):
+    """
+
+    """
     __tablename__ = 'admin'
 
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
@@ -30,10 +36,14 @@ class Admin(User):
 
 
 class Merchant(User):
+    """
+
+    """
     __tablename__ = 'merchant'
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     api_key = db.Column(db.String(120), unique=True, nullable=False)
+    db.relationship('Transaction', backref='merchant', lazy=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'merchant',

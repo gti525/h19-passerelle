@@ -6,3 +6,6 @@ Flask-Script
 flask-migrate
 gunicorn
 python-dotenv
+marshmallow
+sqlalchemy_utils
+luhn
