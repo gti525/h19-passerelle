@@ -2,7 +2,7 @@ from app import db
 from app.models.base import TimestampMixin
 
 
-class User(db.Model,TimestampMixin):
+class User(TimestampMixin,db.Model):
     """
 
     """

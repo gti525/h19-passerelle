@@ -16,9 +16,9 @@ api = Api(app, version='1.0', title='PaymentGateway - API',
 )
 db = SQLAlchemy(app)
 
+from app.models import  *
 from app.routes import main
 from app.routes import api
-
 
 if __name__ == '__main__':
     app.run(debug=True)

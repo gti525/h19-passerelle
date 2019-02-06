@@ -14,7 +14,7 @@ class CreditCardSchema(Schema):
     exp_month = fields.Integer(required=True,error_messages={'required': 'Expiration month is required.'})
     exp_year = fields.Integer(required=True,error_messages={'required': 'Expiration year is required.'})
 
-    @validates("exp_year")
+    @validates("exp_month")
     def validate_amount(self,value):
         if value > 2000 + datetime.today().year:
             raise abort(400,INVALID_REQUEST)
