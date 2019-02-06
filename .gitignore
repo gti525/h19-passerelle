@@ -337,3 +337,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/venv,linux,macos,flask,python,windows,pycharm+all
+
+
+# Database for local development
+app.db
