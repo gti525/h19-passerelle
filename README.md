@@ -16,10 +16,46 @@ Python
 Flask
 * [Flask MEGA Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
 * [Flask By Example - Project Setup](https://realpython.com/flask-by-example-part-1-project-setup/)
-* [Plusieurs exemple de projets flask](https://realpython.com/search?q=flask)
+* [Plusieurs exemples de projets flask](https://realpython.com/search?q=flask)
 
 Git
-* [Breve introduction a Git](http://rogerdudler.github.io/git-guide/)
+* [Brève introduction a Git](http://rogerdudler.github.io/git-guide/)
 
 ## Database
 
+````
+# Create the db in the shell
+python
+
+# now you are in the shell
+from app import db
+db.create_all()
+
+# exit the shell
+exit()
+
+# init the database
+python manage.py init
+
+
+# apply the migration
+python manage.py migrate
+
+
+#upgrade the db
+python manage.py upgrade
+
+
+````
+
+## Heroku
+
+```
+#run project heroku
+git push heroku master
+
+
+#run local branch on heroku
+git push heroku branchname:master
+
+```
