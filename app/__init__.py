@@ -7,18 +7,29 @@ from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 
-app = Flask(__name__)
-app.config.from_object(os.getenv('APP_SETTINGS'))
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-api = Api(app, version='1.0', title='PaymentGateway - API',
-    description='Passerelle de paiement - GTI525:H19',
-)
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
-from app.models import  *
-from app.routes import main
-from app.routes import api
+api = Api(version='1.0',
+          title='PaymentGateway - API',
+          description='Passerelle de paiement - GTI525:H19',
+          )
 
-if __name__ == '__main__':
-    app.run(debug=True)
+def create_app(config_name=None):
+    app = Flask(__name__)
+    if config_name is None:
+        config_name = os.getenv('APP_SETTINGS')  # config_name = "development"
+
+    app.config.from_object(config_name)
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    api.init_app(app)
+    db.init_app(app)
+
+    from app.models.users import Admin, Merchant, User
+    from app.models.trasactions import Transaction
+
+    from app.routes import main
+    from app.routes import api as apis
+
+    return app

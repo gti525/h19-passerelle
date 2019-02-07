@@ -1,7 +1,8 @@
 from flask import render_template
 
-from app import app, db
+from app import create_app, db
 
+app = create_app()
 
 @app.errorhandler(404)
 def not_found_error(error):
