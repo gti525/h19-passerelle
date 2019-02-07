@@ -3,9 +3,8 @@
 import os
 import unittest
 
-from app import app, db
-
-TEST_DB = 'test.db'
+from app import create_app, db
+import config
 
 
 class BasicTests(unittest.TestCase):
@@ -16,13 +15,9 @@ class BasicTests(unittest.TestCase):
 
     # executed prior to each test
     def setUp(self):
-        app.config['TESTING'] = True
-        app.config['WTF_CSRF_ENABLED'] = False
-        app.config['DEBUG'] = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/{}'.format(TEST_DB)
+        app = create_app(config=config.TestingConfig)
         self.app = app.test_client()
-        db.drop_all()
-        db.create_all()
+
 
         # Disable sending emails during unit testing
         self.assertEqual(app.debug, False)

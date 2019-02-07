@@ -15,12 +15,12 @@ api = Api(version='1.0',
           description='Passerelle de paiement - GTI525:H19',
           )
 
-def create_app(config_name=None):
+def create_app(config=None):
     app = Flask(__name__)
-    if config_name is None:
-        config_name = os.getenv('APP_SETTINGS')  # config_name = "development"
+    if config is None:
+        config = os.getenv('APP_SETTINGS')  # config_name = "development"
 
-    app.config.from_object(config_name)
+    app.config.from_object(config)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     api.init_app(app)
