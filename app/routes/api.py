@@ -8,6 +8,8 @@ from app.utils.decorators import parse_with, has_api_key
 ns = api.namespace('transactions', description='Transaction operations')
 
 credit_card_model = api.model('Credit Card',{
+    'first_name': fields.String(required=True, example="John"),
+    'last_name': fields.String(required=True, example="Doe"),
     'number': fields.Integer(required=True,example="356938035643809"),
     'cvv': fields.Integer(required=True,example="765"),
     'exp_month': fields.Integer(required=True,example=10),
@@ -19,9 +21,7 @@ merchant_model = api.model("Merchant",{
 })
 
 transaction_model = api.model('Transactions', {
-    'first_name': fields.String(required=True,example="John"),
-    'last_name': fields.String(required=True,example="Doe"),
-    'amount': fields.Integer(min=0,required=True,example=100),
+    'amount': fields.Fixed(min=0.01, required=True, decimals=2, example=42.12),
     'purchase_desc': fields.String(required=True,example="PURCHASE/ Simons "),
     'credit_card': fields.Nested(credit_card_model),
     'merchant': fields.Nested(merchant_model),
