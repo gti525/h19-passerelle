@@ -1,6 +1,6 @@
 flask
 flask-login
-flask_restplus
+flask-restplus
 flask_sqlalchemy
 Flask-Script
 flask-migrate
@@ -9,3 +9,4 @@ python-dotenv
 marshmallow
 sqlalchemy_utils
 luhn
+pytest

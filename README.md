@@ -47,6 +47,16 @@ python manage.py upgrade
 
 
 ````
+## Run tests
+
+```
+#run ALL test
+pytest
+
+#run one test
+pytest filename
+
+```
 
 ## Heroku
 
