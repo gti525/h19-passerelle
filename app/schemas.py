@@ -16,29 +16,39 @@ class BaseSchema(Schema):
 
 
 class CreditCardSchema(BaseSchema):
+    """
+    Credit card attributes
+    """
+    first_name = fields.Str(required=True, error_messages={'required': 'First name is required.'})
+    last_name = fields.Str(required=True, error_messages={'required': 'Last name is required.'})
     number = fields.Str(required=True, error_messages={'required': 'Credit Card Number is required.'})
     cvv = fields.Integer(required=True, error_messages={'required': 'CVV is required.'})
-    exp_month = fields.Integer(required=True, error_messages={'required': 'Expiration month is required.'})
-    exp_year = fields.Integer(required=True, error_messages={'required': 'Expiration year is required.'})
+    exp = fields.String(required=True, error_messages={'required': 'Expiration month is required.'})
 
-    @validates("exp_month")
-    def validate_month(self, value):
-        if value > 2000 + datetime.today().year:
+    @validates("exp")
+    def validate_exp(self, value):
+        if len(value) != 5:
             raise abort(400, INVALID)
 
-    @validates("exp_year")
-    def validate_year(self, value):
-        if value > datetime.today().month:
+        try:
+            exp = value.split("/")
+            month = int(exp[0])
+            year = int(exp[1])
+        except :
             raise abort(400, INVALID)
 
-    @validates("number")
-    def validate_number(self, value):
-        if value > 0:
+        year_invalid = year + 2000 < datetime.today().year
+        same_year = year + 2000 == datetime.today().year
+        month_invalid_same_year = month < datetime.today().month
+        if year_invalid:
+            raise abort(400, INVALID)
+        elif same_year and month_invalid_same_year:
             raise abort(400, INVALID)
 
     @validates("number")
     def validate_credit_card_number(self, value):
         if not luhn.verify(str(value)) and len(value) == 16:
+            print("1")
             raise abort(400, INVALID)
 
 
@@ -51,8 +61,6 @@ class TransactionCreateSchema(BaseSchema):
     """
     Transaction attributes use during the creation of a transaction
     """
-    first_name = fields.Str(required=True, error_messages={'required': 'First name is required.'})
-    last_name = fields.Str(required=True, error_messages={'required': 'Last name is required.'})
     amount = fields.Integer(required=True, error_messages={'required': 'Amount is required.'})
     purchase_desc = fields.Str(required=True, error_messages={'required': 'Purchase description is required.'})
     credit_card = fields.Nested(CreditCardSchema)
@@ -64,8 +72,15 @@ class TransactionCreateSchema(BaseSchema):
             raise abort(400, INVALID)
 
 
-class TransactionConfirmCancelSchema(BaseSchema):
+class TransactionConfirmSchema(BaseSchema):
     """
-    Transaction schemas for confirm or canceling a transaction
+    Transaction schemas for confirm a transaction
+    """
+    transaction_number = fields.Str(required=True, error_messages={"required": " Transaction is required"})
+
+
+class TransactionCancelSchema(BaseSchema):
+    """
+    Transaction schemas for cancel  transaction
     """
     transaction_number = fields.Str(required=True, error_messages={"required": " Transaction is required"})

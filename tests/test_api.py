@@ -14,11 +14,11 @@ class APITestCase(unittest.TestCase):
         self.client = self.app.test_client
         self.valid_transaction = {
             'API_KEY': "RANDOM",
-            "first_name": "John",
-            "last_name": "Doe",
             "amount": 100,
             "purchase_desc": "PURCHASE/ Simons ",
             "credit_card": [json.dumps({
+                "first_name": "John",
+                "last_name": "Doe",
                 "number": "356938035643809",
                 "cvv": "765",
                 "exp_month": 10,
