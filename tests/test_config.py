@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from app import app as passerelle
+from app import create_app
 from config import TestingConfig, DevelopmentConfig, StagingConfig
 
 import pytest
@@ -12,7 +12,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Roo
 
 @pytest.fixture
 def app():
-    app = passerelle
+    app = create_app()
     app.config.from_object(TestingConfig)
     return app
 
