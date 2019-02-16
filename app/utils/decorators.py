@@ -52,12 +52,12 @@ def parse_with(schema, arg_name='entity', **kwargs):
         return inner
     return decorator
 
-def has_api_key(api_parser):
+def HasApiKey(parser):
     def decorator(f):
         @functools.wraps(f)
         def inner(*fargs, **fkwargs):
 
-            args = api_parser.parse_args()
+            args = parser.parse_args()
             if args["API_KEY"]:
                 return f(*fargs, **fkwargs)
             abort(401,message="Unauthorized access")
