@@ -1,0 +1,142 @@
+<!doctype html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css'>
+    <link rel='stylesheet'
+        href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff'>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- icons :) -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+    </style>
+    <title>Modifier profil</title>
+</head>
+
+<body>
+    <ul id="slide-out" class="side-nav fixed z-depth-2">
+        <li class="center no-padding">
+            <div class="indigo darken-2 white-text" style="height: 125px;">
+                <div class="row">
+                    <i class="material-icons prefix">account_circle</i>
+                    <p style="margin-top: -13%;">
+                        Tim Hortons
+                    </p>
+                </div>
+            </div>
+        </li>
+        <li id="dash_dashboard"><a class="waves-effect" href="merchandDashboard.html"><b>Tableau de bord</b></a></li>
+        <ul class="collapsible" data-collapsible="accordion">
+            <li id="dash_products">
+                <a class="waves-effect" href="transactionsMerchant.html"><b>Transactions</b></a>
+            </li>
+        </ul>
+    </ul>
+
+    <header>
+        <ul class="dropdown-content" id="user_dropdown">
+            <li><a class="indigo-text" href="changeInfo.html">Profile</a></li>
+            <li><a class="indigo-text" href="login.html">Logout</a></li>
+        </ul>
+
+        <nav class="indigo" role="navigation">
+            <div class="nav-wrapper">
+
+                <ul class="right hide-on-med-and-down">
+                    <li>
+                        <a class='right dropdown-button' href='' data-activates='user_dropdown'><i
+                                class=' material-icons'>account_circle</i></a>
+                    </li>
+                </ul>
+
+                <a href="#" data-activates="slide-out" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+            </div>
+        </nav>
+
+    </header>
+
+    <main>
+        <h4 align="center">Modification du mot de passe</h4>
+        <div class="container">
+            <form class="card">
+                <div class="row">
+                    <div class="input-field col s10">
+                        <i class="material-icons prefix">lock_circle</i>
+                        <input id="password" type="password" class="validate">
+                        <label for="password">Mot de passe courant</label>
+                    </div>
+                    <div class="input-field col s10">
+                        <i class="material-icons prefix">lock_circle</i>
+                        <input id="password" type="password" class="validate">
+                        <label for="password">Nouveau mot de passe</label>
+                    </div>
+
+                    <div class="input-field col s10">
+                        <i class="material-icons prefix">lock_circle</i>
+                        <input id="password" type="password" class="validate">
+                        <label for="password">Valider le nouveau mot de passe</label>
+                    </div>
+                    <div class="input-field col s4">
+                        <a class="waves-effect waves-light btn" onlick="alert('Mot de passe modifier')">Modifier mot de passe</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <h4 align="center">Modification du nom</h4>
+        <div class="container">
+            <form class="card">
+                <div class="row">
+                    <div class="input-field col s10">
+                        <i class="material-icons prefix">people</i>
+                        <input id="name" type="text" value="Tim Hortons" class="validate">
+                        <label for="name">Nom de marchand</label>
+                    </div>
+                    <div class="input-field col s4">
+                        <a class="waves-effect waves-light btn" onlick="alert('Nom modifier')">Modifier nom</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <h4 align="center">Modification du compte bancaire</h4>
+        <div class="container">
+            <form class="card">
+                <div class="row">
+                    <div class="input-field col s10">
+                        <i class="material-icons prefix">account_balance</i>
+                        <input id="name" type="text" value="0120 1455 4564 1561" class="validate">
+                        <label for="name">Compte bancaire</label>
+                    </div>
+                    <div class="input-field col s4">
+                        <a class="waves-effect waves-light btn" onlick="alert('Nom modifier')">Modifier nom</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+    <footer class="indigo page-footer">
+            <div class="container col s6">
+                <div class="row">
+                    <div class="col l6 s12">
+                        <h5 class="white-text">Basée sur la page de</h5>
+                        <span> <a style='font-weight: bold;' href="https://github.com/piedcipher" target="_blank"> Tirth
+                                Patel</a></span>
+                    </div>
+                </div>
+        </footer>
+</body>
+
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de bord</title>
+
+
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css'>
+    <link rel='stylesheet'
+        href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff'>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- icons :) -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+    </style>
+
+</head>
+
+<!-- fake data-->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Journée', 'Transactions'],
+            ['02-05', 100],
+            ['02-06', 310],
+            ['02-07', 400],
+            ['02-08', 450]
+        ]);
+
+        var options = {
+            title: 'Volume des transactions dans les 4 derniers jours',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+    }
+</script>
+
+<!-- fake data-->
+
+<body>
+    <ul id="slide-out" class="side-nav fixed z-depth-2">
+        <li class="center no-padding">
+            <div class="indigo darken-2 white-text" style="height: 125px;">
+                <div class="row">
+                    <i class="material-icons prefix">account_circle</i>
+                    <p style="margin-top: -13%;">
+                        Tim Hortons
+                    </p>
+                </div>
+            </div>
+        </li>
+
+        <li id="dash_dashboard"><a class="waves-effect" href="merchandDashboard.html"><b>Tableau de bord</b></a></li>
+        <ul class="collapsible" data-collapsible="accordion">
+            <li id="dash_products" href="transactions.html">
+                <a class="waves-effect" href="transactionsMerchant.html"><b>Transactions</b></a>
+            </li>
+        </ul>
+    </ul>
+
+    <header>
+        <ul class="dropdown-content" id="user_dropdown">
+            <li><a class="indigo-text" href="changeInfo.html">Profile</a></li>
+            <li><a class="indigo-text" href="login.html">Logout</a></li>
+        </ul>
+
+        <nav class="indigo" role="navigation">
+            <div class="nav-wrapper">
+                <ul class="right hide-on-med-and-down">
+                    <li>
+                        <a class='right dropdown-button' href='' data-activates='user_dropdown'><i
+                                class=' material-icons'>account_circle</i></a>
+                    </li>
+                </ul>
+
+                <a href="#" data-activates="slide-out" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+            </div>
+        </nav>
+
+    </header>
+
+    <main>
+        
+        <div class="row">
+            <div class="col s12">
+                <div style="padding: 35px;" align="center" class="card">
+                    <div class="row">
+                        <div class="left card-title">
+                            <b>Transactions</b>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <ul class="pagination">
+                            <li class="disabled"><a href="transactionsMerchant.html"><i
+                                        class="material-icons">chevron_left</i></a></li>
+                            <li class="active"><a href="transactionsMerchant.html">1</a></li>
+                            <li class="waves-effect"><a href="transactionsMerchant.html">2</a></li>
+                            <li class="waves-effect"><a href="transactionsMerchant.html">3</a></li>
+                            <li class="waves-effect"><a href="transactionsMerchant.html">4</a></li>
+                            <li class="waves-effect"><a href="transactionsMerchant.html">5</a></li>
+                            <li class="waves-effect">
+                                <ahref="transactionsAdmin.html"><i class="material-icons">chevron_right</i></a>
+                            </li>
+                        </ul>
+                        <div class="nav-wrapper">
+                                <form>
+                                    <div class="input-field">
+                                        <input id="search" type="search" required>
+                                        <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                                        <i class="material-icons">close</i>
+                                    </div>
+                                </form>
+                            </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Marchand</th>
+                                    <th>Prix</th>
+                                    <th>Carte de crédit</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>Lamotte</td>
+                                    <td>Pierrette</td>
+                                    <td>Tim Hortons</td>
+                                    <td>$1.87</td>
+                                    <td>5446</td>
+                                    <td>2019-02-07</td>
+                                </tr>
+                                <tr>
+                                    <td>Escobar</td>
+                                    <td>Pablo</td>
+                                    <td>Tim Hortons</td>
+                                    <td>$1.87</td>
+                                    <td>5436</td>
+                                    <td>2019-02-07</td>
+                                </tr>
+                                <tr>
+                                    <td>César</td>
+                                    <td>Jules</td>
+                                    <td>Tim Hortons</td>
+                                    <td>$1.87</td>
+                                    <td>5426</td>
+                                    <td>2019-02-07</td>
+                                </tr>
+                                <tr>
+                                    <td>DiePie</td>
+                                    <td>Pew</td>
+                                    <td>Tim Hortons</td>
+                                    <td>$1.87</td>
+                                    <td>5465</td>
+                                    <td>2019-02-07</td>
+                                </tr>
+                                <tr>
+                                    <td>DiePie</td>
+                                    <td>Pew</td>
+                                    <td>Tim Hortons</td>
+                                    <td>$1.87</td>
+                                    <td>5465</td>
+                                    <td>2019-02-07</td>
+                                </tr>
+                                <tr>
+                                    <td>DiePie</td>
+                                    <td>Pew</td>
+                                    <td>Tim Hortons</td>
+                                    <td>$1.87</td>
+                                    <td>5465</td>
+                                    <td>2019-02-07</td>
+                                </tr>
+                                <tr>
+                                    <td>DiePie</td>
+                                    <td>Pew</td>
+                                    <td>Tim Hortons</td>
+                                    <td>$1.87</td>
+                                    <td>5465</td>
+                                    <td>2019-02-07</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="indigo page-footer">
+        <div class="container col s6">
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="white-text">Basée sur la page de</h5>
+                    <span> <a style='font-weight: bold;' href="https://github.com/piedcipher" target="_blank"> Tirth
+                            Patel</a></span>
+                </div>
+            </div>
+    </footer>
+</body>
+
+</html>
+<script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js'></script>
+
+
+
+<script src="js/index.js"></script>
+
+
+
+
+</body>
+
+</html>
