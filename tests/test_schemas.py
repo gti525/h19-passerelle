@@ -89,6 +89,7 @@ class TestTransactionSchema(object):
     ],ids=[])
     def test_valid_transaction(self,amount,purchase_desc):
         data = {
+            'API_KEY':"sdfsadgsadgas",
             "amount": amount,
             "purchase_desc": purchase_desc,
             "merchant": {"name": "Elvis", "id": "fhvg"},
