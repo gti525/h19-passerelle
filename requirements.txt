@@ -10,3 +10,5 @@ marshmallow
 sqlalchemy_utils
 luhn
 pytest
+pycrypto
+pycryptodome
