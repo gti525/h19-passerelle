@@ -2,7 +2,7 @@ from flask import jsonify
 from flask_restplus import Resource, fields, reqparse
 
 from app import api_V1
-from app.schemas import TransactionCreateSchema, TransactionConfirmSchema, TransactionCancelSchema
+from app.schemas import TransactionCreateSchema, TransactionConfirmSchema
 from app.utils.decorators import parse_with, HasApiKey
 from app.utils.http_codes import *
 
@@ -14,7 +14,7 @@ tn = api_V1.namespace('transaction', description='Transaction operations')
 credit_card_model = tn.model('Credit Card', {
     'first_name': fields.String(required=True, example="John"),
     'last_name': fields.String(required=True, example="Doe"),
-    'number': fields.Integer(required=True, example="356938035643809"),
+    'number': fields.Integer(required=True, example="1111222233334444"),
     'cvv': fields.Integer(required=True, example="765"),
     'exp': fields.String(required=True, example="10/22"),
 })
@@ -82,18 +82,3 @@ class TransactionResourceConfirmation(Resource):
     def post(self, **kwargs):
         return jsonify({"result": SUCCESS})
 
-
-@tn.route("/<string:trans_id>/cancel")
-class TransactionResourceCancel(Resource):
-    """
-    Endpoint for transaction cancel
-    """
-
-    @HasApiKey(api_parser)
-    @tn.expect(cancellation_model)
-    @tn.response(200, SUCCESS)
-    @tn.response(400, INVALID)
-    @tn.response(401, UNAUTHORIZED_ACCESS)
-    @parse_with(TransactionCancelSchema(strict=True))
-    def post(self, **kwargs):
-        return jsonify({"result": SUCCESS})

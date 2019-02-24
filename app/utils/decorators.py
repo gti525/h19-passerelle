@@ -2,6 +2,7 @@ import functools
 
 from flask import request
 from flask_restplus import reqparse, abort
+from marshmallow import ValidationError
 
 
 def parse_request(*args,**kwargs):
@@ -46,7 +47,13 @@ def parse_with(schema, arg_name='entity', **kwargs):
         @functools.wraps(f)
         def inner(*fargs, **fkwargs):
             json = request.get_json() or {}
-            entity, errors = schema.load(json, **kwargs)
+            try:
+                entity, errors = schema.load(json, **kwargs)
+            except ValidationError:
+                abort(400,"Invalid body request")
+            except ValueError:
+                abort(400,"Invalid body request")
+
             fkwargs.update({arg_name: entity})
             return f(*fargs, **fkwargs)
         return inner
