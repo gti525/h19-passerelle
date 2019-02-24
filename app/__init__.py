@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
+from flask import render_template
 
 load_dotenv()
 
@@ -30,12 +31,23 @@ def create_app(config=None):
     from app.models.trasactions import Transaction
 
     from app.routes.main import main_bp
-    from app.routes.errors import error_bp
+    from app.routes.login import  login_bp
     from app.routes.api import tn
 
     api_V1.add_namespace(tn)
     api_V1.init_app(app)
 
-    app.register_blueprint(error_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(login_bp)
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        # note that we set the 404 status explicitly
+        return render_template('404.html'), 404
+
+    @app.errorhandler(500)
+    def page_not_found(e):
+        # note that we set the 500 status explicitly
+        return render_template('500.html'), 500
+
     return app
