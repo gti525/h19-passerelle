@@ -51,7 +51,6 @@ class APITestCase(unittest.TestCase):
         """ Test index """
         res = self.client().get('/index', data={})
         self.assertEqual(res.status_code, 200)
-        self.assertIn('Home', str(res.title))
 
     def test_transaction_without_api_key(self):
         """Test API call without API_KEY"""
