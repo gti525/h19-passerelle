@@ -1,5 +1,6 @@
 <!--
-Part of the base dashboard come from Tirth Patel, it has been heavily modified!
+Part of the base dashboard come from Tirth Patel, it has been more than heavily modified!
+It was used as the base skeleton but most of it is changed
 
 Copyright (c) 2019 by Tirth Patel (https://codepen.io/T-P/pen/MyNjOO)
 

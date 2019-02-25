@@ -1,28 +1,36 @@
+<!doctype html>
 <html>
 <head>
-    {% if title %}
-    <title>{{ title }} - Passerrelle</title>
-    {% else %}
-    <title>Welcome to Passerrelle</title>
-    {% endif %}
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
-
+    {% block head %}
+    <!--<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff'>-->
+    <!-- Compiled and minified CSS
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">-->
+    <!-- Compiled and minified JavaScript
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>-->
+    <!-- icons :) -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js'></script>
+    <script src="/static/index.js"></script>
+    <link rel="stylesheet" href="/static/style.css" >
+    <title>{% block title %}{% endblock %} - Passerelle</title>
+    {% endblock %}
 </head>
 <body>
-<h2>Passerelle</h2>
-<section class="section">
-    <div class="container">
-        {% block content %}
-        {% endblock %}
-    </div>
-</section>
-
-<footer class="footer">
-    <div class="content has-text-centered">
-        <p>
-            <strong>Passerelle</strong> by Team Passerrelle
-        </p>
+{% block content %}{% endblock %}
+</body>
+<footer class="indigo page-footer">
+    <div class="container col s6">
+        <div class="row">
+            <div class="col l6 s12">
+                <h5 class="white-text">Basée sur la page de</h5>
+                <span> <a style='font-weight: bold;' href="https://github.com/piedcipher" target="_blank"> &copy; Tirth
+              Patel</a></span>
+                {% block footer %}
+                {% endblock %}
+            </div>
+        </div>
     </div>
 </footer>
-</body>
 </html>

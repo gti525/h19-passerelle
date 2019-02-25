@@ -33,6 +33,13 @@ def create_app(config=None):
 
     from app.routes.main import main_bp
     from app.routes.login import  login_bp
+    from app.routes.dashboard import dashboard_bp
+    from app.routes.settings import settings_bp
+    from app.routes.userManagement import userManagement_bp
+    from app.routes.userModify import userModify_bp
+    from app.routes.register import register_bp
+    from app.routes.transaction import transaction_bp
+
     from app.routes.api import tn
 
     api_V1.add_namespace(tn)
@@ -40,6 +47,12 @@ def create_app(config=None):
 
     app.register_blueprint(main_bp)
     app.register_blueprint(login_bp)
+    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(settings_bp)
+    app.register_blueprint(userManagement_bp)
+    app.register_blueprint(userModify_bp)
+    app.register_blueprint(register_bp)
+    app.register_blueprint(transaction_bp)
 
     login_manager = LoginManager()
     login_manager.init_app(app)
