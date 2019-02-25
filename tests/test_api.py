@@ -49,7 +49,7 @@ class APITestCase(unittest.TestCase):
 
     def test_index2(self):
         """ Test index """
-        res = self.client().get('/main/index', data={})
+        res = self.client().get('/index', data={})
         self.assertEqual(res.status_code, 200)
         self.assertIn('Home', str(res.data))
 
