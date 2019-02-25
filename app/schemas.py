@@ -50,6 +50,7 @@ class TransactionCreateSchema(Schema):
     """
     Transaction attributes use during the creation of a transaction
     """
+    API_KEY = fields.Str(required=True, error_messages={'required': 'API_KEY is required.'})
     amount = fields.Number(required=True, error_messages={'required': 'Amount is required.'})
     purchase_desc = fields.Str(required=True, error_messages={'required': 'Purchase description is required.'})
     credit_card = fields.Nested(CreditCardSchema)

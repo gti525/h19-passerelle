@@ -2,8 +2,12 @@ from flask import jsonify
 from flask_restplus import Resource, fields, reqparse
 
 from app import api_V1
+from app import db
+from app.models.trasactions import Transaction
+from app.models.users import Merchant
 from app.schemas import TransactionCreateSchema, TransactionConfirmSchema
 from app.utils.decorators import parse_with, HasApiKey
+from app.utils.genrators import random_with_N_digits
 from app.utils.http_codes import *
 
 MERCHANT_API_KEY = "Merchant API_KEY"
@@ -25,7 +29,7 @@ merchant_model = tn.model("Merchant", {
 })
 
 transaction_model = tn.model('Transactions', {
-    API_KEY: fields.String(required=True, exammple="1234567890"),
+    API_KEY: fields.String(required=True, example="1234567890"),
     'amount': fields.Integer(min=0, required=True, example=100),
     'purchase_desc': fields.String(required=True, example="PURCHASE/ Simons "),
     'credit_card': fields.Nested(credit_card_model),
@@ -44,9 +48,11 @@ confirmation_model = tn.model('Transaction confirmation', {
     API_KEY: fields.String(required=True, example="98765431235465"),
 })
 
-# api_parser = tn.parser()
-# api_parser.add_argument(API_KEY, location="headers")
-
+#transactio success model
+success_transaction_modal = tn.model('Sucessful transaction', {
+    'transaction_number': fields.String(example="3330382145"),
+    "result": fields.String(example=SUCCESS),
+})
 api_parser = reqparse.RequestParser()
 api_parser.add_argument('API_KEY')
 
@@ -58,13 +64,44 @@ class TransactionResourceCreate(Resource):
     """
 
     @tn.expect(transaction_model)
-    @tn.response(200, SUCCESS)
+    @tn.response(200, SUCCESS,success_transaction_modal)
     @tn.response(400, INVALID)
     @tn.response(401, UNAUTHORIZED_ACCESS)
     @HasApiKey(api_parser)
     @parse_with(TransactionCreateSchema(strict=True))
     def post(self, **kwargs):
-        return jsonify({"result": SUCCESS})
+        entity = kwargs["entity"]
+        transaction = Transaction(
+            id=random_with_N_digits(10),
+            first_name=entity["credit_card"]["first_name"],
+            last_name=entity["credit_card"]["last_name"],
+            credit_card_number=entity["credit_card"]["number"],
+            exp=entity["credit_card"]["exp"],
+            cvv=entity["credit_card"]["cvv"],
+            amount=entity["amount"],
+            label=entity["purchase_desc"],
+            merchant_id=entity["merchant"]["id"]
+        )
+
+        transaction_valid = True
+
+        try:
+            # Validate API KEY
+            merchant = Merchant.query.filter_by(id=entity["API_KEY"]).first()
+
+           # if merchant is None:
+           #     transaction_valid = False
+
+
+
+            if transaction_valid:
+                db.session.add(transaction)
+                db.session.commit()
+                return jsonify({"result": SUCCESS, "transaction_number": transaction.id})
+            else:
+                return jsonify({"result": INVALID}),400
+        except ValueError:
+            return jsonify({"result": INVALID}), 400
 
 
 @tn.route("/<string:trans_id>/confirm")
@@ -81,4 +118,8 @@ class TransactionResourceConfirmation(Resource):
     @parse_with(TransactionConfirmSchema(strict=True))
     def post(self, **kwargs):
         return jsonify({"result": SUCCESS})
+
+
+def processCreditCard():
+    headers ={"X-API-KEY":"15489123311"}
 
