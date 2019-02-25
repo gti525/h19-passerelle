@@ -59,8 +59,7 @@ class TransactionCreateSchema(Schema):
     @validates("amount")
     def validate_amount(self, value):
         if value < 0:
-            self.error = ValidationError("Amount is invalid")
-            raise self.error
+            raise ValidationError("Amount is invalid")
 
 
 class TransactionConfirmSchema(Schema):
