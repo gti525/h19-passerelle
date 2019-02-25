@@ -5,6 +5,7 @@ from flask import Flask
 from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
+from flask_login import LoginManager
 
 load_dotenv()
 
@@ -39,6 +40,13 @@ def create_app(config=None):
 
     app.register_blueprint(main_bp)
     app.register_blueprint(login_bp)
+
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(user_id)
 
     @app.errorhandler(404)
     def page_not_found(e):

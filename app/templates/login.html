@@ -11,25 +11,27 @@
         </div>
     </nav>
     <div class="container">
-        <form class="card">
+        <form class="card" action="" method="post">
             <div class="row">
                 <div class="input-field col s10">
                     <i class="material-icons prefix">account_circle</i>
-                    <input id="email" type="email" class="validate">
+                    <input id="email" type="email" name="email" class="validate" value="{{ request.form.email }}">
                     <label for="email">Courriel</label>
                 </div>
 
                 <div class="input-field col s10">
                     <i class="material-icons prefix">lock_circle</i>
-                    <input id="password" type="password" class="validate">
+                    <input id="password" name="password" type="password" class="validate" value="{{ request.form.password }}">
                     <label for="password">Mot de passe</label>
                 </div>
                 <div class="input-field col s4">
-                    <a class="waves-effect waves-light btn" href="index.html">Se connecter admin</a>
-                    <a class="waves-effect waves-light btn" href="merchandDashboard.html">Se connecter marchand</a>
+                    <button type="submit" class="waves-effect waves-light btn">Se connecter</button>
                 </div>
             </div>
         </form>
+        {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+            {% endif %}
     </div>
 </main>
 {% endblock %}

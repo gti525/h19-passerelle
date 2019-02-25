@@ -1,5 +1,6 @@
 from app import db
 from app.models.base import TimestampMixin
+import datetime
 
 
 class User(TimestampMixin,db.Model):
@@ -12,6 +13,24 @@ class User(TimestampMixin,db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     type = db.Column(db.String(50))
+
+    def __init__(self , username ,email , password, type):
+        self.username = username
+        self.password = password
+        self.email = email
+        self.type = type
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
 
     def __repr__(self):
         return '<User %r>' % self.email
