@@ -1,6 +1,6 @@
 from flask import jsonify
 from flask_restplus import Resource, fields, reqparse
-
+import requests
 from app import api_V1
 from app import db
 from app.models.trasactions import Transaction
@@ -9,6 +9,7 @@ from app.schemas import TransactionCreateSchema, TransactionConfirmSchema
 from app.utils.decorators import parse_with, HasApiKey
 from app.utils.genrators import random_with_N_digits
 from app.utils.http_codes import *
+from app.utils.aes import encrypt, decrypt
 
 MERCHANT_API_KEY = "Merchant API_KEY"
 API_KEY = "API_KEY"
@@ -48,7 +49,7 @@ confirmation_model = tn.model('Transaction confirmation', {
     API_KEY: fields.String(required=True, example="98765431235465"),
 })
 
-#transactio success model
+# transactio success model
 success_transaction_modal = tn.model('Sucessful transaction', {
     'transaction_number': fields.String(example="3330382145"),
     "result": fields.String(example=SUCCESS),
@@ -64,7 +65,7 @@ class TransactionResourceCreate(Resource):
     """
 
     @tn.expect(transaction_model)
-    @tn.response(200, SUCCESS,success_transaction_modal)
+    @tn.response(200, SUCCESS, success_transaction_modal)
     @tn.response(400, INVALID)
     @tn.response(401, UNAUTHORIZED_ACCESS)
     @HasApiKey(api_parser)
@@ -89,8 +90,8 @@ class TransactionResourceCreate(Resource):
             # Validate API KEY
             merchant = Merchant.query.filter_by(id=entity["API_KEY"]).first()
 
-           # if merchant is None:
-           #     transaction_valid = False
+            # if merchant is None:
+            #     transaction_valid = False
 
 
 
@@ -99,7 +100,7 @@ class TransactionResourceCreate(Resource):
                 db.session.commit()
                 return jsonify({"result": SUCCESS, "transaction_number": transaction.id})
             else:
-                return jsonify({"result": INVALID}),400
+                return jsonify({"result": INVALID}), 400
         except ValueError:
             return jsonify({"result": INVALID}), 400
 
@@ -120,6 +121,20 @@ class TransactionResourceConfirmation(Resource):
         return jsonify({"result": SUCCESS})
 
 
-def processCreditCard():
-    headers ={"X-API-KEY":"15489123311"}
+def processCreditCard(amount, merchant_name, card_number, cvv, month_exp, year_exp):
+    url = "http://banque2-h19-dev.herokuapp.com/api/paymentGateway"
+    headers = {"X-API-KEY": "15489123311"}
+    data = {
+        "bankId": "9bb9426e-f176-4a76-9be5-68709325e43c",
+        "amount": amount,
+        "merchant": merchant_name,
+        "account": {
+            "number": encrypt(card_number),
+            "monthExp": month_exp,
+            "yearExp": year_exp,
+            "cvv": encrypt(cvv)
+        }
+    }
+    r = requests.get(url, headers=headers, params=data)
 
+    return r.status_code == 200
