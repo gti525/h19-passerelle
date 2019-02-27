@@ -16,15 +16,12 @@ def register():
 
         form = RegistrationForm()
         if form.validate_on_submit():
-            user = User(username=form.username.data, email=form.email.data, password=form.password.data,
-                        type=form.type.data)
-            user.set_password(form.password.data)
-            user.set_type(form.type.data)
+            user = User(form.email.data, form.password.data,form.type.data)
 
             db.session.add(user)
             db.session.commit()
             flash('User has been created!')
-            return redirect('index')
+            return redirect('dashboard')
         return render_template('register.html', title='Register', form=form)
     else:
         return redirect('login')
@@ -39,11 +36,6 @@ class RegistrationForm(FlaskForm):
     type = SelectField(u'User Type', choices=[(User.type == 'admin', "Admin"), (User.type == 'merchant', "Merchant")])
 
     submit = SubmitField('Register')
-
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different username.')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()

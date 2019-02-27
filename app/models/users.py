@@ -13,8 +13,7 @@ class User(TimestampMixin,db.Model):
     password = db.Column(db.String(80), nullable=False)
     type = db.Column(db.String(50))
 
-    def __init__(self , username ,email , password, type):
-        self.username = username
+    def __init__(self  ,email , password, type):
         self.password = password
         self.email = email
         self.type = type

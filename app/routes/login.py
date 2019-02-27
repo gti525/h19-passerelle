@@ -15,7 +15,7 @@ def login():
             email = request.form['email']
             password = request.form['password']
             registered_user = User.query.filter_by(email=email, password=password).first()
-            # registered_user = User('papa', email, password, 'admin')
+            # registered_user = User(email, password, 'admin')
             if registered_user is None:
                 return render_template('login.html', error="Courriel ou mot de passe invalide")
             login_user(registered_user)
