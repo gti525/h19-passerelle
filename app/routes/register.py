@@ -16,7 +16,7 @@ def register():
 
         form = RegistrationForm()
         if form.validate_on_submit():
-            user = User(form.email.data, form.password.data,form.type.data)
+            user = User(form.email.data, form.password.data, form.userType.data)
 
             db.session.add(user)
             db.session.commit()
@@ -28,16 +28,14 @@ def register():
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    type = SelectField(u'User Type', choices=[(User.type == 'admin', "Admin"), (User.type == 'merchant', "Merchant")])
-
-    submit = SubmitField('Register')
+    username = StringField('Nom', validators=[DataRequired()])
+    email = StringField('Courriel', validators=[DataRequired(), Email()])
+    password = PasswordField('Mot de passe', validators=[DataRequired()])
+    password2 = PasswordField('Validation Mot de passe', validators=[DataRequired(), EqualTo('password')])
+    userType = SelectField(u'Type', choices=[('admin', 'Administrateur'), ('merchant', 'Marchand')])
+    submit = SubmitField('Enregistrer')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
-            raise ValidationError('Please use a different email address.')
+            raise ValidationError('Veuillez entrer une autre adresse courriel')
