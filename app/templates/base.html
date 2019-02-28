@@ -13,11 +13,42 @@
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css'>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js'></script>
     <script src="/static/index.js"></script>
-    <link rel="stylesheet" href="/static/style.css" >
+    <link rel="stylesheet" href="/static/style.css">
     <title>{% block title %}{% endblock %} - Passerelle</title>
     {% endblock %}
 </head>
 <body>
+<header>
+    {% if current_user.is_authenticated %}
+    <ul class="dropdown-content" id="user_dropdown">
+        <li><a class="indigo-text" href={{ url_for('settings.settings')}}>Profile</a></li>
+        <li><a class="indigo-text" href={{ url_for('login.logout')}}>Logout</a></li>
+    </ul>
+
+    <nav class="indigo" role="navigation">
+        <div class="nav-wrapper">
+            <ul class="right hide-on-med-and-down">
+                <li>
+                    <a class='right dropdown-button' href='' data-activates='user_dropdown'><i
+                            class=' material-icons'>account_circle</i></a>
+                    <a class='right dropdown-button' href={{ url_for('transaction.transaction')}} >Transactions</a>
+                     <a class='right dropdown-button' href={{ url_for('userManagement.userManagement')}} >Gérer usagers</a>
+                </li>
+            </ul>
+            <a href="#" data-activates="slide-out" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+        </div>
+    </nav>
+    {% else %}
+    <nav>
+        <div class="indigo nav-wrapper">
+            <a href="#!" class="brand-logo"><i class="material-icons">monetization_on</i>Passerelle</a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="#">Nous contacter</a></li>
+            </ul>
+        </div>
+    </nav>
+    {% endif %}
+</header>
 {% block content %}{% endblock %}
 </body>
 <footer class="indigo page-footer">

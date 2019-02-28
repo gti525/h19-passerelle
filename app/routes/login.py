@@ -1,5 +1,5 @@
 from flask import render_template, Blueprint, redirect, request
-from flask_login import login_user, current_user
+from flask_login import login_user, current_user, logout_user
 from app.models.users import User
 
 login_bp = Blueprint('login', __name__, url_prefix='/login')
@@ -22,3 +22,9 @@ def login():
             return redirect('dashboard')
     else:
         return redirect('dashboard')
+
+
+@login_bp.route("/logout", methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    return redirect('login')

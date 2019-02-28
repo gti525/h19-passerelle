@@ -30,64 +30,6 @@
 </script>
 
 <!-- fake data-->
-<ul id="slide-out" class="side-nav fixed z-depth-2">
-    <li class="center no-padding">
-        <div class="indigo darken-2 white-text" style="height: 125px;">
-            <div class="row">
-                <i class="material-icons prefix">account_circle</i>
-                <p style="margin-top: -13%;">
-                    Administrateur
-                </p>
-            </div>
-        </div>
-    </li>
-
-    <li id="dash_dashboard"><a class="waves-effect" href="#!"><b>Tableau de bord</b></a></li>
-
-    <ul class="collapsible" data-collapsible="accordion">
-        <li id="dash_users">
-            <div id="dash_users_header" class="collapsible-header waves-effect"><b>Utilisateurs</b></div>
-            <div id="dash_users_body" class="collapsible-body">
-                <ul>
-                    <li id="users_seller">
-                        <a class="waves-effect" style="text-decoration: none;"
-                           href="{{ url_for('login.login') }}">Marchand</a>
-                    </li>
-
-                    <li id="users_customer">
-                        <a class="waves-effect" style="text-decoration: none;"
-                           href="adminCreation.html">Administrateur</a>
-                    </li>
-                </ul>
-            </div>
-        </li>
-
-        <li id="dash_products">
-            <a class="waves-effect" style="text-decoration: none;" href="transactionsAdmin.html"><b>Transactions</b></a>
-        </li>
-    </ul>
-</ul>
-
-<header>
-    <ul class="dropdown-content" id="user_dropdown">
-        <li><a class="indigo-text" href="#!">Profile</a></li>
-        <li><a class="indigo-text" href="login.html">Logout</a></li>
-    </ul>
-
-    <nav class="indigo" role="navigation">
-        <div class="nav-wrapper">
-            <ul class="right hide-on-med-and-down">
-                <li>
-                    <a class='right dropdown-button' href='' data-activates='user_dropdown'><i
-                            class=' material-icons'>account_circle</i></a>
-                </li>
-            </ul>
-
-            <a href="#" data-activates="slide-out" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
-        </div>
-    </nav>
-
-</header>
 
 <main>
     <div class="row">
@@ -274,25 +216,6 @@
 </script>
 
 <!-- fake data-->
-    <ul id="slide-out" class="side-nav fixed z-depth-2">
-        <li class="center no-padding">
-            <div class="indigo darken-2 white-text" style="height: 125px;">
-                <div class="row">
-                    <i class="material-icons prefix">account_circle</i>
-                    <p style="margin-top: -13%;">
-                        Tim Hortons
-                    </p>
-                </div>
-            </div>
-        </li>
-
-        <li id="dash_dashboard"><a class="waves-effect" href="#!"><b>Tableau de bord</b></a></li>
-        <ul class="collapsible" data-collapsible="accordion">
-            <li id="dash_products" href="transactions.html">
-                <a class="waves-effect" href="transactionsMerchant.html"><b>Transactions</b></a>
-            </li>
-        </ul>
-    </ul>
 
     <header>
         <ul class="dropdown-content" id="user_dropdown">

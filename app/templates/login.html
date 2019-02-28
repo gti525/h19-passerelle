@@ -2,14 +2,6 @@
 {% block title %}Connexion{% endblock %}
 {% block content %}
 <main>
-    <nav>
-        <div class="indigo nav-wrapper">
-            <a href="#!" class="brand-logo"><i class="material-icons">monetization_on</i>Passerelle</a>
-            <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="#">Nous contacer</a></li>
-            </ul>
-        </div>
-    </nav>
     <div class="container">
         <form class="card" action="" method="post">
             <div class="row">
@@ -21,7 +13,8 @@
 
                 <div class="input-field col s10">
                     <i class="material-icons prefix">lock_circle</i>
-                    <input id="password" name="password" type="password" class="validate" value="{{ request.form.password }}">
+                    <input id="password" name="password" type="password" class="validate"
+                           value="{{ request.form.password }}">
                     <label for="password">Mot de passe</label>
                 </div>
                 <div class="input-field col s4">

@@ -1,69 +1,6 @@
 {% extends "base.html" %}
-
 {% block content %}
-register des users. visible selon les droits
 <!-- Création d'usager par  administrateur -->
-<ul class="side-nav fixed z-depth-2" id="slide-out">
-    <li class="center no-padding">
-        <div class="indigo darken-2 white-text" style="height: 125px;">
-            <div class="row">
-                <i class="material-icons prefix">account_circle</i>
-                <p style="margin-top: -13%;">
-                    Administrateur
-                </p>
-            </div>
-        </div>
-    </li>
-
-    <li id="dash_dashboard"><a class="waves-effect" href="index.html"><b>Tableau de bord</b></a></li>
-
-    <ul class="collapsible" data-collapsible="accordion">
-        <li id="dash_users">
-            <div class="collapsible-header waves-effect" id="dash_users_header"><b>Utilisateurs</b></div>
-            <div class="collapsible-body" id="dash_users_body">
-                <ul>
-                    <li id="users_seller">
-                        <a class="waves-effect" href="merchantManagement.html"
-                           style="text-decoration: none;">Marchand</a>
-                    </li>
-
-                    <li id="users_customer">
-                        <a class="waves-effect" href="adminCreation.html"
-                           style="text-decoration: none;">Administrateur</a>
-                    </li>
-                </ul>
-            </div>
-        </li>
-
-        <li id="dash_products">
-            <a class="waves-effect" href="transactionsAdmin.html"
-               style="text-decoration: none;"><b>Transactions</b></a>
-        </li>
-    </ul>
-</ul>
-
-<header>
-    <ul class="dropdown-content" id="user_dropdown">
-        <li><a class="indigo-text" href="changepw.html">Profile</a></li>
-        <li><a class="indigo-text" href="login.html">Logout</a></li>
-    </ul>
-
-    <nav class="indigo" role="navigation">
-        <div class="nav-wrapper">
-
-            <ul class="right hide-on-med-and-down">
-                <li>
-                    <a class='right dropdown-button' href='' data-activates='user_dropdown'><i
-                            class=' material-icons'>account_circle</i></a>
-                </li>
-            </ul>
-
-            <a href="#" data-activates="slide-out" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
-        </div>
-    </nav>
-
-</header>
-
 <main>
     <h4 align="center">Création d'un usager</h4>
     <form action="" method="post">
