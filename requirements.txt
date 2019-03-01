@@ -12,3 +12,6 @@ luhn
 pytest
 pycrypto
 pycryptodome
+attrs==17.4.0
+wtforms
+flask_wtf
