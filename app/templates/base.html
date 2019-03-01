@@ -14,9 +14,21 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js'></script>
     <script src="/static/index.js"></script>
     <link rel="stylesheet" href="/static/style.css">
+    <script>
+    $(document).ready(function() {
+       $('select').material_select();
+   });
+    </script>
     <title>{% block title %}{% endblock %} - Passerelle</title>
     {% endblock %}
 </head>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <script>alert('{{ message }}');</script>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 <body>
 <header>
     {% if current_user.is_authenticated %}
@@ -24,7 +36,6 @@
         <li><a class="indigo-text" href={{ url_for('settings.settings')}}>Profile</a></li>
         <li><a class="indigo-text" href={{ url_for('login.logout')}}>Logout</a></li>
     </ul>
-
     <nav class="indigo" role="navigation">
         <div class="nav-wrapper">
             <ul class="right hide-on-med-and-down">
@@ -32,7 +43,8 @@
                     <a class='right dropdown-button' href='' data-activates='user_dropdown'><i
                             class=' material-icons'>account_circle</i></a>
                     <a class='right dropdown-button' href={{ url_for('transaction.transaction')}} >Transactions</a>
-                     <a class='right dropdown-button' href={{ url_for('userManagement.userManagement')}} >Gérer usagers</a>
+                    <a class='right dropdown-button' href={{ url_for('userManagement.userManagement')}} >Gérer
+                    usagers</a>
                 </li>
             </ul>
             <a href="#" data-activates="slide-out" class="button-collapse"><i class="mdi-navigation-menu"></i></a>

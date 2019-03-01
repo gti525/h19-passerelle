@@ -13,11 +13,6 @@ class User(TimestampMixin,db.Model):
     password = db.Column(db.String(80), nullable=False)
     type = db.Column(db.String(50))
 
-    def __init__(self  ,email , password, type):
-        self.password = password
-        self.email = email
-        self.type = type
-
     def is_authenticated(self):
         return True
 
@@ -65,3 +60,12 @@ class Merchant(User):
     __mapper_args__ = {
         'polymorphic_identity': 'merchant',
     }
+
+    def __repr__(self):
+        return (
+            self.password,
+            self.email,
+            self.type,
+            self.name,
+            self.api_key
+        )
