@@ -1,6 +1,7 @@
 from flask import render_template, Blueprint, redirect, request
 from flask_login import login_user, current_user, logout_user
 from app.models.users import User
+from app.utils.aes import encrypt
 
 login_bp = Blueprint('login', __name__, url_prefix='/login')
 
@@ -13,7 +14,7 @@ def login():
             return render_template('login.html', title='Connexion')
         elif request.method == 'POST':
             email = request.form['email']
-            password = request.form['password']
+            password = encrypt(request.form['password'])
             registered_user = User.query.filter_by(email=email, password=password).first()
             # registered_user = User(email, password, 'admin')
             if registered_user is None:

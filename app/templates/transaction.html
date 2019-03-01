@@ -29,6 +29,16 @@
     }
 
 
+
+
+
+
+
+
+
+
+
+
 </script>
 
 <!-- fake data-->
@@ -45,16 +55,16 @@
                 </div>
                 <div class="row">
                     <ul class="pagination">
-                        <li class="disabled"><a href="transactionsMerchant.html"><i
-                                class="material-icons">chevron_left</i></a></li>
-                        <li class="active"><a href="transactionsMerchant.html">1</a></li>
-                        <li class="waves-effect"><a href="transactionsMerchant.html">2</a></li>
-                        <li class="waves-effect"><a href="transactionsMerchant.html">3</a></li>
-                        <li class="waves-effect"><a href="transactionsMerchant.html">4</a></li>
-                        <li class="waves-effect"><a href="transactionsMerchant.html">5</a></li>
+                        <li class="disabled">
+                            <a href="transactionsMerchant.html"><i class="material-icons">chevron_left</i></a>
+                        </li>
+                        <li class="active"><a href={{ url_for('transaction.transaction')}}>1</a></li>
+                        <li class="waves-effect"><a href={{ url_for('transaction.transaction')}}>2</a></li>
+                        <li class="waves-effect"><a href={{ url_for('transaction.transaction')}}>3</a></li>
                         <li class="waves-effect">
-                            <ahref
-                            ="transactionsAdmin.html"><i class="material-icons">chevron_right</i></a>
+                            <a href={{ url_for('transaction.transaction')}}>
+                                <i class="material-icons">chevron_right</i>
+                            </a>
                         </li>
                     </ul>
                     <div class="nav-wrapper">
@@ -71,70 +81,21 @@
                         <tr>
                             <th>Nom</th>
                             <th>Prénom</th>
-                            <th>Marchand</th>
-                            <th>Prix</th>
                             <th>Carte de crédit</th>
-                            <th>Date</th>
+                            <th>Montant</th>
+                            <th>Description</th>
                         </tr>
                         </thead>
-
                         <tbody>
+                        {% for transaction in transactions %}
                         <tr>
-                            <td>Lamotte</td>
-                            <td>Pierrette</td>
-                            <td>Tim Hortons</td>
-                            <td>$1.87</td>
-                            <td>5446</td>
-                            <td>2019-02-07</td>
+                            <td>{{transaction.last_name}}</td>
+                            <td>{{transaction.first_name}}</td>
+                            <td>{{transaction.credit_card_number}}</td>
+                            <td>${{ "{:,.2f}".format(transaction.amount)}}</td>
+                            <td>{{transaction.label}}</td>
                         </tr>
-                        <tr>
-                            <td>Escobar</td>
-                            <td>Pablo</td>
-                            <td>Tim Hortons</td>
-                            <td>$1.87</td>
-                            <td>5436</td>
-                            <td>2019-02-07</td>
-                        </tr>
-                        <tr>
-                            <td>César</td>
-                            <td>Jules</td>
-                            <td>Tim Hortons</td>
-                            <td>$1.87</td>
-                            <td>5426</td>
-                            <td>2019-02-07</td>
-                        </tr>
-                        <tr>
-                            <td>DiePie</td>
-                            <td>Pew</td>
-                            <td>Tim Hortons</td>
-                            <td>$1.87</td>
-                            <td>5465</td>
-                            <td>2019-02-07</td>
-                        </tr>
-                        <tr>
-                            <td>DiePie</td>
-                            <td>Pew</td>
-                            <td>Tim Hortons</td>
-                            <td>$1.87</td>
-                            <td>5465</td>
-                            <td>2019-02-07</td>
-                        </tr>
-                        <tr>
-                            <td>DiePie</td>
-                            <td>Pew</td>
-                            <td>Tim Hortons</td>
-                            <td>$1.87</td>
-                            <td>5465</td>
-                            <td>2019-02-07</td>
-                        </tr>
-                        <tr>
-                            <td>DiePie</td>
-                            <td>Pew</td>
-                            <td>Tim Hortons</td>
-                            <td>$1.87</td>
-                            <td>5465</td>
-                            <td>2019-02-07</td>
-                        </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -142,11 +103,9 @@
         </div>
 
     </div>
-</main>
-<!-- end merchant -->
-<!-- fake data-->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
+    <!-- end merchant -->
+    <!-- fake data-->
+    <script type="text/javascript">
     google.charts.load('current', { 'packages': ['corechart'] });
     google.charts.setOnLoadCallback(drawChart);
 
@@ -193,10 +152,15 @@
     }
 
 
-</script>
 
-<!-- fake data-->
-<main>
+
+
+
+
+
+    </script>
+
+    <!-- fake data-->
     <div class="row">
         <div class="col s6">
             <div style="padding: 20px" align="center" class="card">
@@ -218,99 +182,6 @@
                 <div id="chart_div"></div>
             </div>
         </div>
-
-        </row>
-        <row>
-            <div class="col s12">
-                <div style="padding: 35px;" align="center" class="card">
-                    <div class="row">
-                        <div class="left card-title">
-                            <b>Transactions</b>
-                        </div>
-                    </div>
-                    <ul class="pagination">
-                        <li class="disabled"><a href="transactionsAdmin.html"><i
-                                class="material-icons">chevron_left</i></a></li>
-                        <li class="active"><a href="transactionsAdmin.html">1</a></li>
-                        <li class="waves-effect"><a href="transactionsAdmin.html">2</a></li>
-                        <li class="waves-effect"><a href="transactionsAdmin.html">3</a></li>
-                        <li class="waves-effect"><a href="transactionsAdmin.html">4</a></li>
-                        <li class="waves-effect"><a href="transactionsAdmin.html">5</a></li>
-                        <li class="waves-effect">
-                            <ahref
-                            ="transactionsAdmin.html"><i class="material-icons">chevron_right</i></a>
-                        </li>
-                    </ul>
-                    <div class="row">
-                        <div class="nav-wrapper">
-                            <form>
-                                <div class="input-field">
-                                    <input id="search" type="search" required>
-                                    <label class="label-icon" for="search"><i
-                                            class="material-icons">search</i></label>
-                                    <i class="material-icons">close</i>
-                                </div>
-                            </form>
-                        </div>
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Nom</th>
-                                <th>Prénom</th>
-                                <th>Marchand</th>
-                                <th>Prix</th>
-                                <th>Carte de crédit</th>
-                                <th>Date</th>
-                            </tr>
-                            </thead>
-
-                            <tbody>
-                            <tr>
-                                <td>Lamotte</td>
-                                <td>Pierrette</td>
-                                <td>StubHub</td>
-                                <td>$71.87</td>
-                                <td>5446</td>
-                                <td>2019-02-07</td>
-                            </tr>
-                            <tr>
-                                <td>Escobar</td>
-                                <td>Pablo</td>
-                                <td>StubHub</td>
-                                <td>$71.87</td>
-                                <td>5436</td>
-                                <td>2019-02-07</td>
-                            </tr>
-                            <tr>
-                                <td>César</td>
-                                <td>Jules</td>
-                                <td>Tim hortons</td>
-                                <td>$1.87</td>
-                                <td>5426</td>
-                                <td>2019-02-07</td>
-                            </tr>
-                            <tr>
-                                <td>DiePie</td>
-                                <td>Pew</td>
-                                <td>Tim hortons</td>
-                                <td>$1.87</td>
-                                <td>5465</td>
-                                <td>2019-02-07</td>
-                            </tr>
-                            <tr>
-                                <td>Bloom</td>
-                                <td>Orlando</td>
-                                <td>Evenko</td>
-                                <td>$1.87</td>
-                                <td>5465</td>
-                                <td>2019-02-07</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
     </div>
 </main>
 

@@ -19,9 +19,9 @@ def register():
         form = RegistrationForm()
         if form.validate_on_submit():
             if form.userType.data == 'admin':
-                user = Admin(email=form.email.data, password=form.password.data, type=form.userType.data)
+                user = Admin(email=form.email.data, password=encrypt(form.password.data), type=form.userType.data)
             else:
-                user = Merchant( email=form.email.data, password=form.password.data, type=form.userType.data, name=form.username.data, api_key=encrypt(str(random_with_N_digits(2))+form.email.data +form.username.data))
+                user = Merchant( email=form.email.data, password=encrypt(form.password.data), type=form.userType.data, name=form.username.data, api_key=encrypt(str(random_with_N_digits(2))+form.email.data +form.username.data))
 
             db.session.add(user)
             db.session.commit()

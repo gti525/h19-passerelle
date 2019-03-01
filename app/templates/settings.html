@@ -3,95 +3,54 @@
 {% block content %}
 <!-- change pw from admin -->
 
-    <main>
-        <h4 align="center">Modification du mot de passe</h4>
-        <div class="container">
-            <form class="card">
-                <div class="row">
-                    <div class="input-field col s10">
-                        <i class="material-icons prefix">lock_circle</i>
-                        <input id="password" type="password" class="validate">
-                        <label for="password">Mot de passe courant</label>
-                    </div>
-                    <div class="input-field col s10">
-                        <i class="material-icons prefix">lock_circle</i>
-                        <input id="password" type="password" class="validate">
-                        <label for="password">Nouveau mot de passe</label>
-                    </div>
+<main>
+    <h4 align="center">Modification du mot de passe</h4>
+    <div class="container">
+        <form class="card">
+            <div class="row">
+                <div class="input-field col s10">
+                    <i class="material-icons prefix">lock_circle</i>
+                    <input id="password0" type="password" class="validate">
+                    <label for="password0">Mot de passe courant</label>
+                </div>
+                <div class="input-field col s10">
+                    <i class="material-icons prefix">lock_circle</i>
+                    <input id="password1" type="password" class="validate">
+                    <label for="password1">Nouveau mot de passe</label>
+                </div>
 
-                    <div class="input-field col s10">
-                        <i class="material-icons prefix">lock_circle</i>
-                        <input id="password" type="password" class="validate">
-                        <label for="password">Valider le nouveau mot de passe</label>
-                    </div>
-                    <div class="input-field col s4">
-                        <a class="waves-effect waves-light btn" onlick="alert('Mot de passe modifier')">Modifier mot de
-                            passe</a>
-                    </div>
+                <div class="input-field col s10">
+                    <i class="material-icons prefix">lock_circle</i>
+                    <input id="password2" type="password" class="validate">
+                    <label for="password2">Valider le nouveau mot de passe</label>
                 </div>
-            </form>
-        </div>
-    </main>
+                <div class="input-field col s4">
+                    <a class="waves-effect waves-light btn" onlick="alert('Mot de passe modifier')">Modifier mot de
+                        passe</a>
+                </div>
+            </div>
+        </form>
+    </div>
 
-<!-- fin change pw from admin -->
-<!-- chang info marchand -->
-    <main>
-        <h4 align="center">Modification du mot de passe</h4>
-        <div class="container">
-            <form class="card">
-                <div class="row">
-                    <div class="input-field col s10">
-                        <i class="material-icons prefix">lock_circle</i>
-                        <input id="password" type="password" class="validate">
-                        <label for="password">Mot de passe courant</label>
-                    </div>
-                    <div class="input-field col s10">
-                        <i class="material-icons prefix">lock_circle</i>
-                        <input id="password" type="password" class="validate">
-                        <label for="password">Nouveau mot de passe</label>
-                    </div>
-
-                    <div class="input-field col s10">
-                        <i class="material-icons prefix">lock_circle</i>
-                        <input id="password" type="password" class="validate">
-                        <label for="password">Valider le nouveau mot de passe</label>
-                    </div>
-                    <div class="input-field col s4">
-                        <a class="waves-effect waves-light btn" onlick="alert('Mot de passe modifier')">Modifier mot de passe</a>
-                    </div>
+    <!-- fin change pw from admin -->
+    <!-- chang info marchand -->
+    <h4 align="center">Modification du nom</h4>
+    <div class="container">
+        <form class="card">
+            <div class="row">
+                <div class="input-field col s10">
+                    <i class="material-icons prefix">people</i>
+                    <input id="name" type="text" value="Tim Hortons" class="validate">
+                    <label for="name">Nom de marchand</label>
                 </div>
-            </form>
-        </div>
-        <h4 align="center">Modification du nom</h4>
-        <div class="container">
-            <form class="card">
-                <div class="row">
-                    <div class="input-field col s10">
-                        <i class="material-icons prefix">people</i>
-                        <input id="name" type="text" value="Tim Hortons" class="validate">
-                        <label for="name">Nom de marchand</label>
-                    </div>
-                    <div class="input-field col s4">
-                        <a class="waves-effect waves-light btn" onlick="alert('Nom modifier')">Modifier nom</a>
-                    </div>
+                <div class="input-field col s4">
+                    <a class="waves-effect waves-light btn" onlick="alert('Nom modifier')">Modifier nom</a>
                 </div>
-            </form>
-        </div>
-        <h4 align="center">Modification du compte bancaire</h4>
-        <div class="container">
-            <form class="card">
-                <div class="row">
-                    <div class="input-field col s10">
-                        <i class="material-icons prefix">account_balance</i>
-                        <input id="name" type="text" value="0120 1455 4564 1561" class="validate">
-                        <label for="name">Compte bancaire</label>
-                    </div>
-                    <div class="input-field col s4">
-                        <a class="waves-effect waves-light btn" onlick="alert('Nom modifier')">Modifier nom</a>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </main>
+            </div>
+        </form>
+    </div>
+    </form>
+    </div>
+</main>
 <!-- fin change info marchand -->
 {% endblock %}

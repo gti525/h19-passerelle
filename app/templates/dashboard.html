@@ -27,45 +27,39 @@
     chart.draw(data, options);
   }
 
+
+
+
 </script>
 
 <!-- fake data-->
 
 <main>
     <div class="row">
-        <div class="col s6">
-            <div style="padding: 35px;" align="center" class="card">
+        {% if current_user.type == 'admin' %}
+        <div class="col s2">
+            <div style="padding: 25px;" align="center" class="card">
                 <div class="row">
                     <div class="left card-title">
-                        <b>Gestion des usagers</b>
+                        <b>Ajouter des usagers</b>
                     </div>
                 </div>
 
                 <div class="row">
-                    <a href="merchantCreation.html">
-                        <div style="padding: 30px;" class="grey lighten-3 col s5 waves-effect">
-                            <i class="indigo-text text-lighten-1 large material-icons">group_add</i>
-                            <span class="indigo-text text-lighten-1">
-                  <h5>Marchand</h5>
-                </span>
-                        </div>
-                    </a>
-                    <div class="col s1">&nbsp;</div>
-                    <div class="col s1">&nbsp;</div>
-
-                    <a href="adminCreation.html">
-                        <div style="padding: 30px;" class="grey lighten-3 col s5 waves-effect">
-                            <i class="indigo-text text-lighten-1 large material-icons">person_add</i>
-                            <span class="indigo-text text-lighten-1">
-                  <h5>Administrateur</h5>
-                </span>
-                        </div>
+                    <a href={{ url_for('register.register')}}>
+                    <div style="padding: 30px;" class="grey lighten-3 waves-effect">
+                        <i class="indigo-text text-lighten-1 large material-icons">group_add</i>
+                        <span class="indigo-text text-lighten-1">
+                                <h5>Nouveau usagers</h5>
+                            </span>
+                    </div>
                     </a>
                 </div>
             </div>
         </div>
+        {% endif %}
 
-        <div class="col s6">
+        <div class="col s10">
             <div style="padding: 20px" align="center" class="card">
                 <div class="row">
                     <div class="left card-title">
@@ -145,7 +139,6 @@
 </main>
 <!-- debut marchand -->
 <!-- fake data-->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
     google.charts.load('current', { 'packages': ['corechart', 'bar'] });
     google.charts.setOnLoadCallback(drawChart);
@@ -213,41 +206,44 @@
 
         chart2.draw(data2, google.charts.Bar.convertOptions(options2));
     }
+
+
+
 </script>
 
 <!-- fake data-->
 
-    <main>
-        <div class="row">
-            <div class="col s6">
-                <div style="padding: 20px" align="center" class="card">
-                    <div class="row">
-                        <div class="left card-title">
-                            <b>Transactions des derniers jours</b>
-                        </div>
+<main>
+    <div class="row">
+        <div class="col s6">
+            <div style="padding: 20px" align="center" class="card">
+                <div class="row">
+                    <div class="left card-title">
+                        <b>Transactions des derniers jours</b>
                     </div>
-                    <div id="curve_chart" style="width: 550px; height: 300px"></div>
                 </div>
+                <div id="curve_chart" style="width: 550px; height: 300px"></div>
             </div>
-
-
-            <div class="col s6">
-                <div style="padding: 0px;" align="center" class="card">
-                    <div class="row">
-                    </div>
-                    <div id="chart_div"></div>
-                </div>
-            </div>
-
-            <div class="col s12">
-                <div style="padding: 15px;" align="center" class="card">
-                    <div class="row">
-                    </div>
-                    <div id="columnchart_material" style="width: 1000px; height: 550px;"></div>
-                </div>
-            </div>
-
         </div>
-    </main>
-    <!-- fin merchant -->
+
+
+        <div class="col s6">
+            <div style="padding: 0px;" align="center" class="card">
+                <div class="row">
+                </div>
+                <div id="chart_div"></div>
+            </div>
+        </div>
+
+        <div class="col s12">
+            <div style="padding: 15px;" align="center" class="card">
+                <div class="row">
+                </div>
+                <div id="columnchart_material" style="width: 1000px; height: 550px;"></div>
+            </div>
+        </div>
+
+    </div>
+</main>
+<!-- fin merchant -->
 {% endblock %}
