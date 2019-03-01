@@ -8,7 +8,7 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = os.getenv('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = "postgres://fpdgdsdmpfgcbv:e9475e3851180bed9881ead8f9ab1567bdefe60b6e144f3109f3a2c9dbeeff13@ec2-54-225-227-125.compute-1.amazonaws.com:5432/d7077c2rlc150n"
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 
 
 class ProductionConfig(Config):
@@ -27,4 +27,4 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "postgres://fpdgdsdmpfgcbv:e9475e3851180bed9881ead8f9ab1567bdefe60b6e144f3109f3a2c9dbeeff13@ec2-54-225-227-125.compute-1.amazonaws.com:5432/d7077c2rlc150n"
+    SQLALCHEMY_DATABASE_URI = 'sqlite:////' + os.path.join(basedir, 'test.db')
