@@ -5,6 +5,24 @@ from marshmallow import Schema
 from marshmallow import fields, validates, ValidationError
 
 
+class DateSchema(Schema):
+    """
+    Date attributes
+    """
+    year = fields.Integer(required=True, error_messages={'required': 'Year is required.'})
+    month = fields.Integer(required=True, error_messages={'required': 'Month is required.'})
+
+    @validates("month")
+    def validate_exp(self, value):
+        if 1 < value < 12:
+            raise ValidationError("Month is invalid")
+
+    @validates("year")
+    def validate_exp(self, value):
+        if value < datetime.today().year and value < 2000:
+            raise ValidationError("Year is invalid")
+
+
 class CreditCardSchema(Schema):
     """
     Credit card attributes
@@ -12,27 +30,21 @@ class CreditCardSchema(Schema):
     first_name = fields.Str(required=True, error_messages={'required': 'First name is required.'})
     last_name = fields.Str(required=True, error_messages={'required': 'Last name is required.'})
     number = fields.Str(required=True, error_messages={'required': 'Credit Card Number is required.'})
-    cvv = fields.Integer(required=True, error_messages={'required': 'CVV is required.'})
-    exp = fields.String(required=True, error_messages={'required': 'Expiration month is required.'})
+    exp = fields.Nested(DateSchema)
 
     @validates("exp")
     def validate_exp(self, value):
-        if len(value) != 5:
-            raise ValidationError("Expiration date is invalid")
 
         try:
-            exp = value.split("/")
-            month = int(exp[0])
-            year = int(exp[1])
+            month = value["month"]
+            year = value["year"]
         except:
             raise ValidationError("Expiration date is invalid")
 
-        year_invalid = year + 2000 < datetime.today().year
-        same_year = year + 2000 == datetime.today().year
+        same_year = year == datetime.today().year
         month_invalid_same_year = month < datetime.today().month
-        if year_invalid:
-            raise ValidationError("Expiration date is invalid")
-        elif same_year and month_invalid_same_year:
+
+        if same_year and month_invalid_same_year:
             raise ValidationError("Expiration date is invalid")
 
     @validates("number")
