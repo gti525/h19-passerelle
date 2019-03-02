@@ -1,6 +1,30 @@
 {% extends "base.html" %}
-
+{% block title %}Connexion{% endblock %}
 {% block content %}
-login
+<main>
+    <div class="container">
+        <form action="" method="post">
+            <div class="row">
+                <div class="input-field col s10">
+                    <i class="material-icons prefix">account_circle</i>
+                    <input id="email" type="email" name="email" class="validate" value="{{ request.form.email }}">
+                    <label for="email">Courriel</label>
+                </div>
 
+                <div class="input-field col s10">
+                    <i class="material-icons prefix">lock_circle</i>
+                    <input id="password" name="password" type="password" class="validate"
+                           value="{{ request.form.password }}">
+                    <label for="password">Mot de passe</label>
+                </div>
+                <div class="input-field col s4">
+                    <button type="submit" class="waves-effect waves-light btn">Se connecter</button>
+                </div>
+            </div>
+        </form>
+        {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+            {% endif %}
+    </div>
+</main>
 {% endblock %}

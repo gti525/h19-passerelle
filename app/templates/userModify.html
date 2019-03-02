@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Modification d'usager{% endblock %}
+{% block content %}
+
+<main>
+    <h4 align="center">Modification de l'usager</h4>
+    <div class="container">
+        <form>
+            <div class="row">
+                <div class="input-field col s10">
+                    <i class="material-icons prefix">people</i>
+                    <input id="password" type="text" value="Evenko" class="validate">
+                    <label for="password">Nom</label>
+                </div>
+
+
+                <div class="input-field col s10">
+                    <i class="material-icons prefix">account_balance</i>
+                    <input id="password2" type="password" class="validate">
+                    <label for="password">Mot de passe</label>
+                </div>
+
+                <div class="input-field col s10">
+                    <label>
+                        <input type="checkbox" checked="true"/>
+                        <span>Status</span>
+                    </label>
+                    <br/>
+                </div>
+                <div class="input-field col s4">
+                    <a class="waves-effect waves-light btn" onclick="alert('Marchand modifier')">Modifier</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}

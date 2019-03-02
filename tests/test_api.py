@@ -6,5 +6,4 @@ from app import create_app, db
 
 
 class APITestCase(unittest.TestCase):
-    """This class represents the bucketlist test case"""
-
+    """This class represents the API test case"""

@@ -5,7 +5,7 @@ from flask_script import Manager
 
 from app import create_app, db
 
-config = os.getenv('APP_SETTINGS') # config_name = config.DevelopmentConfig
+config = os.getenv('APP_SETTINGS')  # config_name = config.DevelopmentConfig
 
 app = create_app(config)
 migrate = Migrate(app, db)

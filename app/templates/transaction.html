@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- merchant -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Journée', 'Transactions'],
+            ['02-05', 100],
+            ['02-06', 310],
+            ['02-07', 400],
+            ['02-08', 450]
+        ]);
+
+        var options = {
+            title: 'Volume des transactions dans les 4 derniers jours',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+<!-- fake data-->
+
+<main>
+
+    <div class="row">
+        <div class="col s12">
+            <div style="padding: 35px;" align="center" class="card">
+                <div class="row">
+                    <div class="left card-title">
+                        <b>Transactions</b>
+                    </div>
+                </div>
+                <div class="row">
+                    <ul class="pagination">
+                        <li class="disabled">
+                            <a href="transactionsMerchant.html"><i class="material-icons">chevron_left</i></a>
+                        </li>
+                        <li class="active"><a href={{ url_for('transaction.transaction')}}>1</a></li>
+                        <li class="waves-effect"><a href={{ url_for('transaction.transaction')}}>2</a></li>
+                        <li class="waves-effect"><a href={{ url_for('transaction.transaction')}}>3</a></li>
+                        <li class="waves-effect">
+                            <a href={{ url_for('transaction.transaction')}}>
+                                <i class="material-icons">chevron_right</i>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="nav-wrapper">
+                        <form>
+                            <div class="input-field">
+                                <input id="search" type="search" required>
+                                <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                                <i class="material-icons">close</i>
+                            </div>
+                        </form>
+                    </div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Carte de crédit</th>
+                            <th>Montant</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td>{{transaction.last_name}}</td>
+                            <td>{{transaction.first_name}}</td>
+                            <td>{{transaction.credit_card_number}}</td>
+                            <td>${{ "{:,.2f}".format(transaction.amount)}}</td>
+                            <td>{{transaction.label}}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- end merchant -->
+    <!-- fake data-->
+    <script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Journée', 'Transactions'],
+            ['02-05', 560],
+            ['02-06', 671],
+            ['02-07', 850],
+            ['02-08', 1400]
+        ]);
+
+        var options = {
+            title: 'Volume des transactions dans les 4 derniers jours',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        var data1 = new google.visualization.DataTable();
+        data1.addColumn('string', 'Nom du marchand');
+        data1.addColumn('number', 'Nombre de transactions');
+        data1.addRows([
+            ['Tim Horton', 8500],
+            ['Evenko', 3800],
+            ['Stubhub', 12001],
+            ['Kijiji', 2031],
+            ['FB MarketPlace', 751]
+        ]);
+
+        // Set chart options
+        var options1 = {
+            'title': 'Répartition des transactions par marchand dernier mois',
+            'width': 500,
+            'height': 400
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart1 = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart1.draw(data1, options1);
+
+        chart.draw(data, options);
+    }
+
+
+
+
+
+
+
+
+    </script>
+
+    <!-- fake data-->
+    <div class="row">
+        <div class="col s6">
+            <div style="padding: 20px" align="center" class="card">
+                <div class="row">
+                    <div class="left card-title">
+                        <b>Transactions récentes</b>
+                    </div>
+                </div>
+                <div id="curve_chart" style="width: 750px; height: 350px"></div>
+            </div>
+        </div>
+        <div class="col s6">
+            <div style="padding: 20px" align="center" class="card">
+                <div class="row">
+                    <div class="left card-title">
+                        <b>Transactions par marchand</b>
+                    </div>
+                </div>
+                <div id="chart_div"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
