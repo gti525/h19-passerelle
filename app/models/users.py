@@ -55,6 +55,7 @@ class Merchant(User):
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     api_key = db.Column(db.String(120), unique=True, nullable=False)
+    account_number = db.Column(db.String(120), unique=True, nullable=False)
     db.relationship('Transaction', backref='merchant', lazy=True)
 
     __mapper_args__ = {
