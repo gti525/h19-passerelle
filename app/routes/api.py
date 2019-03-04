@@ -1,9 +1,11 @@
+from threading import Timer
+
 from flask import jsonify
 from flask_restplus import Resource, fields, reqparse
 import requests
 from app import api_V1
 from app import db
-from app.models.trasactions import Transaction
+from app.models.trasactions import Transaction, PENDING, REFUSED
 from app.models.users import Merchant
 from app.schemas import TransactionCreateSchema, TransactionConfirmSchema
 from app.utils.decorators import parse_with, HasApiKey
@@ -13,6 +15,7 @@ from app.utils.aes import encrypt, decrypt
 
 MERCHANT_API_KEY = "Merchant API_KEY"
 API_KEY = "API_KEY"
+RESERVATION_TIME = 900  # 15 minutes in seconds
 
 tn = api_V1.namespace('transaction', description='Transaction operations')
 
@@ -111,8 +114,11 @@ class TransactionResourceCreate(Resource):
                         label=trans["purchase_desc"],
                         merchant_id=trans["merchant"]["id"]
                     )
+                    t.authorize()
                     db.session.add(t)
                     db.session.commit()
+
+                    cancel_transaction_timer(t.id)
                     return jsonify({"result": SUCCESS, "transaction_number": t.id}), 200
             else:
                 return jsonify({"result": INVALID}), 400
@@ -125,6 +131,7 @@ class TransactionResourceConfirmation(Resource):
     """
     Endpoint for transaction confirmation
     """
+
     @HasApiKey(api_parser)
     @tn.expect(confirmation_model)
     @tn.response(200, SUCCESS)
@@ -152,3 +159,22 @@ def process_credit_card(amount, merchant_name, card_number, cvv, month_exp, year
     r = requests.post(url, headers=headers, data=data)
 
     return r
+
+
+def cancel_transaction_timer(trans_num):
+    """
+    Change transaction statuts to REFUSED after 15 minutes
+    if still PENDING
+    """
+    def func(trans_num):
+        if trans_num:
+            trans = Transaction.r.query.get(trans_num)
+
+            if trans is not None and trans.status == PENDING:
+                trans.refuse()
+
+                db.session.add(trans)
+                db.session.commit()
+
+    t = Timer(RESERVATION_TIME, func, kwargs={"trans_num": trans_num})
+    t.start()

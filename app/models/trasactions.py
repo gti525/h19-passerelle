@@ -21,3 +21,11 @@ class Transaction(db.Model):
     merchant_id = db.Column(db.Integer, db.ForeignKey('merchant.id'),
                             nullable=False)
     status = db.Column(db.String(100), nullable=False, default=PENDING)
+
+    def refuse(self):
+        """Change status to refused"""
+        self.status = REFUSED
+
+    def authorize(self):
+        """Change status to authorized"""
+        self.status = AUTHORIZED
