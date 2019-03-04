@@ -39,6 +39,7 @@ def create_app(config=None):
     from app.routes.userModify import userModify_bp
     from app.routes.register import register_bp
     from app.routes.transaction import transaction_bp
+    from app.routes.errors import page_not_found, page_error
 
     from app.routes.api import tn
 
@@ -54,6 +55,9 @@ def create_app(config=None):
     app.register_blueprint(register_bp)
     app.register_blueprint(transaction_bp)
 
+    app.register_error_handler(500,page_error)
+    app.register_error_handler(404,page_not_found)
+
     login_manager = LoginManager()
     login_manager.init_app(app)
 
@@ -61,14 +65,6 @@ def create_app(config=None):
     def load_user(user_id):
         return User.query.get(user_id)
 
-    @app.errorhandler(404)
-    def page_not_found(e):
-        # note that we set the 404 status explicitly
-        return render_template('404.html'), 404
 
-    @app.errorhandler(500)
-    def page_not_found(e):
-        # note that we set the 500 status explicitly
-        return render_template('500.html'), 500
 
     return app
