@@ -5,32 +5,30 @@
 <main>
     <h4 align="center">Modification de l'usager</h4>
     <div class="container">
-        <form>
-            <div class="row">
-                <div class="input-field col s10">
-                    <i class="material-icons prefix">people</i>
-                    <input id="password" type="text" value="Evenko" class="validate">
-                    <label for="password">Nom</label>
-                </div>
-
-
-                <div class="input-field col s10">
-                    <i class="material-icons prefix">account_balance</i>
-                    <input id="password2" type="password" class="validate">
-                    <label for="password">Mot de passe</label>
-                </div>
-
-                <div class="input-field col s10">
-                    <label>
-                        <input type="checkbox" checked="true"/>
-                        <span>Status</span>
-                    </label>
-                    <br/>
-                </div>
-                <div class="input-field col s4">
-                    <a class="waves-effect waves-light btn" onclick="alert('Marchand modifier')">Modifier</a>
-                </div>
-            </div>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.name.label }}<br>
+                {{ form.name(size=32) }}<br>
+                {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.account_number.label }}<br>
+                {{ form.account_number(size=32) }}<br>
+                {% for error in form.account_number.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(size=64) }}<br>
+                {% for error in form.email.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit() }}</p>
         </form>
     </div>
 </main>

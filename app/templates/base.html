@@ -23,13 +23,6 @@
     <title>{% block title %}{% endblock %} - Passerelle</title>
     {% endblock %}
 </head>
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<script>alert('{{ message }}');</script>
-{% endfor %}
-{% endif %}
-{% endwith %}
 <body>
 <header>
     {% if current_user.is_authenticated %}
@@ -39,7 +32,7 @@
     </ul>
     <nav class="indigo" role="navigation">
         <div class="nav-wrapper">
-            <a href={{ url_for('dashboard.dashboard')}} class="brand-logo"><i class="material-icons">polymer</i>Passerelle</a>
+            <a href={{ url_for('dashboard.dashboard')}} class="brand-logo"><i class="material-icons">polymer</i></a>
             <ul class="right">
                 <li>
                     <a class='right dropdown-button' href='' data-activates='user_dropdown'><i
@@ -57,7 +50,7 @@
     {% else %}
     <nav>
         <div class="indigo nav-wrapper">
-            <a href="#!" class="brand-logo"><i class="material-icons">monetization_on</i>Passerelle</a>
+            <a href="#!" class="brand-logo"><i class="material-icons">polymer</i>Passerelle</a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
                 <li><a href="#">Nous contacter</a></li>
             </ul>
@@ -80,4 +73,11 @@
         </div>
     </div>
 </footer>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<script>alert('{{ message }}');</script>
+{% endfor %}
+{% endif %}
+{% endwith %}
 </html>
