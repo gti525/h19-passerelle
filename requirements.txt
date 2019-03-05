@@ -10,3 +10,10 @@ marshmallow
 sqlalchemy_utils
 luhn
 pytest
+pycrypto
+pycryptodome
+attrs==17.4.0
+requests
+wtforms
+flask_wtf
+psycopg2

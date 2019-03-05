@@ -17,14 +17,29 @@ def valid_credit_card():
         "last_name": "Degue",
         "number": "1111222233334444",
         "cvv": 856,
-        "exp": "12/19",
+        "exp": "12/2019",
     }
+
+class TestDateSchema(object):
+
+    @pytest.mark.parametrize("month,year", [
+        (10,2020),
+        (10,2024),
+
+    ], ids=["T1", "T2"])
+    def test_valid_credit_card(self, month, year):
+        data = {
+            "month": month,
+            "year": year,
+
+        }
+        assert DateSchema().validate(data=data) == {}
 
 class TestCreditCardSchema(object):
 
     @pytest.mark.parametrize("first_name,last_name, number, cvv, exp", [
-        ("John", "Doe", "1111222233334444", 123, "12/24"),
-        ("John", "Doe", "1111222233334444", 856, "12/19"),
+        ("John", "Doe", "1111222233334444", 123, {"month":12,"year":2024}),
+        ("John", "Doe", "1111222233334444", 856, {"month":10,"year":2024}),
     ], ids=["T1", "T2"])
     def test_valid_credit_card(self, first_name, last_name, number, cvv, exp):
         data = {
@@ -37,11 +52,11 @@ class TestCreditCardSchema(object):
         assert CreditCardSchema().validate(data=data) == {}
 
     @pytest.mark.parametrize("first_name,last_name, number, cvv, exp", [
-        ("John", "Doe", None, 123, "12/24"),
+        ("John", "Doe", None, 123, "12/2024"),
         ("John", "Doe", "1111222233334444", 456, "1219"),
-        (None, "Doe", "1111222233334444", 678, "12/29"),
-        ("John", None, "1111222233334444", 912, "12/29"),
-        ("John", "Doe", "3569380356438091", 321, "12/29"),
+        (None, "Doe", "1111222233334444", 678, {"month":12,"year":2024}),
+        ("John", None, "1111222233334444", 912, {"month":12,"year":20249}),
+        ("John", "Doe", "3569380356438091", 321, {"month":12,"year":2024}),
     ], ids=["T1", "T2", "T3", "T4", "T5"])
     def test_invalid_credit_card(self, first_name, last_name, number, cvv, exp):
         data = {
@@ -89,6 +104,7 @@ class TestTransactionSchema(object):
     ],ids=[])
     def test_valid_transaction(self,amount,purchase_desc):
         data = {
+            'API_KEY':"sdfsadgsadgas",
             "amount": amount,
             "purchase_desc": purchase_desc,
             "merchant": {"name": "Elvis", "id": "fhvg"},
@@ -97,7 +113,7 @@ class TestTransactionSchema(object):
                 "last_name": "Degue",
                 "number": "1111222233334444",
                 "cvv": 856,
-                "exp": "12/19",
+                "exp": {"month":12,"year":2024},
             }
         }
         assert TransactionCreateSchema().validate(data=data) == {}\
@@ -117,7 +133,7 @@ class TestTransactionSchema(object):
                 "last_name": "Degue",
                 "number": "1111222233334444",
                 "cvv": 856,
-                "exp": "12/19",
+                "exp": "12/2019",
             }
         }
         assert TransactionCreateSchema().validate(data=data) != {}

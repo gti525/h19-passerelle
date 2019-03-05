@@ -13,38 +13,20 @@
 Python
 * [Python](https://www.python.org)
 
-Flask
-* [Flask MEGA Tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world)
-* [Flask By Example - Project Setup](https://realpython.com/flask-by-example-part-1-project-setup/)
-* [Plusieurs exemples de projets flask](https://realpython.com/search?q=flask)
-
-Git
-* [Brève introduction a Git](http://rogerdudler.github.io/git-guide/)
-
 ## Database
 
 ````
-# Create the db in the shell
-python
-
-# now you are in the shell
-from app import db
-db.create_all()
-
-# exit the shell
-exit()
 
 # init the database
-python manage.py init
-
-
+python manage.py db init
 # apply the migration
-python manage.py migrate
+python manage.py db migrate
+# upgrade the db
+python manage.py db upgrade
 
-
-#upgrade the db
-python manage.py upgrade
-
+OR
+#execute this
+./setup.sh
 
 ````
 ## Run tests
@@ -54,7 +36,7 @@ python manage.py upgrade
 pytest
 
 #run one test
-pytest filename
+pytest tests/filename
 
 ```
 
@@ -62,10 +44,10 @@ pytest filename
 
 ```
 #run project heroku
-git push heroku master
+git push heroku <branch-name>
 
 
 #run local branch on heroku
-git push heroku branchname:master
+git push heroku <branch-name>:master
 
 ```

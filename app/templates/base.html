@@ -1,28 +1,83 @@
+<!doctype html>
 <html>
 <head>
-    {% if title %}
-    <title>{{ title }} - Passerrelle</title>
-    {% else %}
-    <title>Welcome to Passerrelle</title>
-    {% endif %}
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    {% block head %}
+    <!--<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff'>-->
+    <!-- Compiled and minified CSS
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">-->
+    <!-- Compiled and minified JavaScript
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>-->
+    <!-- icons :) -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js'></script>
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+    $(document).ready(function() {
+       $('select').material_select();
+   });
 
+    </script>
+    <title>{% block title %}{% endblock %} - Passerelle</title>
+    {% endblock %}
 </head>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<script>alert('{{ message }}');</script>
+{% endfor %}
+{% endif %}
+{% endwith %}
 <body>
-<h1>Passerelle</h1>
-<section class="section">
-    <div class="container">
-        {% block content %}
-        {% endblock %}
-    </div>
-</section>
-
-<footer class="footer">
-    <div class="content has-text-centered">
-        <p>
-            <strong>Passerelle</strong> by Team Passerrelle &#8253
-        </p>
+<header>
+    {% if current_user.is_authenticated %}
+    <ul class="dropdown-content" id="user_dropdown">
+        <li><a class="indigo-text" href={{ url_for('settings.settings')}}>Profile</a></li>
+        <li><a class="indigo-text" href={{ url_for('login.logout')}}>Logout</a></li>
+    </ul>
+    <nav class="indigo" role="navigation">
+        <div class="nav-wrapper">
+            <a href={{ url_for('dashboard.dashboard')}} class="brand-logo"><i class="material-icons">polymer</i>Passerelle</a>
+            <ul class="right">
+                <li>
+                    <a class='right dropdown-button' href='' data-activates='user_dropdown'><i
+                            class=' material-icons'>account_circle</i></a>
+                    <a class='right' href={{ url_for('transaction.transaction')}} >Transactions</a>
+                    {% if current_user.type == 'admin' %}
+                    <a class='right' href={{ url_for('userManagement.userManagement')}} >Gérer
+                    usagers</a>
+                    <a class='right' href={{ url_for('register.register')}} >Nouveau usagers</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </nav>
+    {% else %}
+    <nav>
+        <div class="indigo nav-wrapper">
+            <a href="#!" class="brand-logo"><i class="material-icons">monetization_on</i>Passerelle</a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="#">Nous contacter</a></li>
+            </ul>
+        </div>
+    </nav>
+    {% endif %}
+</header>
+{% block content %}{% endblock %}
+</body>
+<footer class="indigo page-footer">
+    <div class="container col s6">
+        <div class="row">
+            <div class="col l6 s12">
+                <h5 class="white-text">Basée sur la page de</h5>
+                <span> <a style='font-weight: bold;' href="https://github.com/piedcipher" target="_blank"> &copy; Tirth
+              Patel</a></span>
+                {% block footer %}
+                {% endblock %}
+            </div>
+        </div>
     </div>
 </footer>
-</body>
 </html>
