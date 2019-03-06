@@ -4,6 +4,8 @@ from flask import request
 from flask_restplus import reqparse, abort
 from marshmallow import ValidationError
 
+from app.consts import MERCHANT_API_KEY
+
 
 def parse_request(*args,**kwargs):
     """
@@ -65,7 +67,7 @@ def HasApiKey(parser):
         def inner(*fargs, **fkwargs):
 
             args = parser.parse_args()
-            if args["API_KEY"]:
+            if args[MERCHANT_API_KEY]:
                 return f(*fargs, **fkwargs)
             abort(401,message="Unauthorized access")
         return inner
