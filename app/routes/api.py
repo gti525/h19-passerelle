@@ -6,16 +6,14 @@ from flask_restplus import Resource, fields, reqparse
 
 from app import api_V1
 from app import db
+from app.consts import *
 from app.models.trasactions import Transaction, PENDING
 from app.models.users import Merchant
 from app.schemas import TransactionCreateSchema, TransactionConfirmSchema
 from app.utils.aes import encrypt
 from app.utils.decorators import parse_with, HasApiKey
 from app.utils.genrators import random_with_N_digits
-from app.utils.http_codes import *
 
-MERCHANT_API_KEY = "Merchant API_KEY"
-API_KEY = "API_KEY"
 RESERVATION_TIME = 900  # 15 minutes in seconds
 
 tn = api_V1.namespace('transaction', description='Transaction operations')
@@ -29,8 +27,8 @@ date_model = tn.model('Expiration date', {
 credit_card_model = tn.model('Credit Card', {
     'first_name': fields.String(required=True, example="John"),
     'last_name': fields.String(required=True, example="Doe"),
-    'number': fields.Integer(required=True, example="1111222233334444"),
-    'cvv': fields.Integer(required=True, example="765"),
+    'number': fields.Integer(required=True, example=1111222233334444),
+    'cvv': fields.Integer(required=True, example=765),
     'exp': fields.Nested(date_model),
 })
 
@@ -40,23 +38,22 @@ merchant_model = tn.model("Merchant", {
 })
 
 transaction_model = tn.model('Transactions', {
-    API_KEY: fields.String(required=True, example="1234567890"),
+    MERCHANT_API_KEY: fields.String(required=True, example="1234567890"),
     'amount': fields.Integer(min=0, required=True, example=100),
     'purchase_desc': fields.String(required=True, example="PURCHASE/ Simons "),
     'credit_card': fields.Nested(credit_card_model),
-    'merchant': fields.Nested(merchant_model),
 })
 
 # Model for transaction cancellation
 cancellation_model = tn.model('Transaction cancellation', {
     'transaction_number': fields.String(required=True, example="1234567890"),
-    API_KEY: fields.String(required=True, example="98765431235465"),
+    MERCHANT_API_KEY: fields.String(required=True, example="98765431235465"),
 })
 
 # Model for transaction confirmation
 confirmation_model = tn.model('Transaction confirmation', {
     'transaction_number': fields.String(required=True, example="1234567890"),
-    API_KEY: fields.String(required=True, example="98765431235465"),
+    MERCHANT_API_KEY: fields.String(required=True, example="98765431235465"),
 })
 
 # transaction success model
@@ -95,13 +92,13 @@ class TransactionResourceCreate(Resource):
 
             if transaction_valid:
 
-                r = process_credit_card(trans["amount"],
-                                        merchant.name,
-                                        trans["credit_card"]["number"],
-                                        trans["credit_card"]["cvv"],
-                                        trans["credit_card"]["exp"]["month"],
-                                        trans["credit_card"]["exp"]["year"],
-                                        )
+                r = preauthorize_payment(trans["amount"],
+                                         merchant.name,
+                                         trans["credit_card"]["number"],
+                                         trans["credit_card"]["cvv"],
+                                         trans["credit_card"]["exp"]["month"],
+                                         trans["credit_card"]["exp"]["year"],
+                                         )
 
                 if r.status_code == 200:
                     t = Transaction(
@@ -114,7 +111,8 @@ class TransactionResourceCreate(Resource):
                         cvv=trans["credit_card"]["cvv"],
                         amount=trans["amount"],
                         label=trans["purchase_desc"],
-                        merchant_id=trans["merchant"]["id"]
+                        merchant_id=trans["merchant"]["id"],
+                        bank_transaction_id=r.json()["transactionId"]
                     )
                     t.authorize()
                     db.session.add(t)
@@ -144,17 +142,17 @@ class TransactionResourceConfirmation(Resource):
         return jsonify({"result": SUCCESS})
 
 
-def process_credit_card(amount, merchant_name, card_number, cvv, month_exp, year_exp):
-    url = "http://banque2-h19-dev.herokuapp.com/api/paymentGateway"
+def preauthorize_payment(card_holder_name, amount, merchant_name, card_number, cvv, month_exp, year_exp):
+    url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
     headers = {"X-API-KEY": "15489123311"}
     data = {
-        "bankId": "9bb9426e-f176-4a76-9be5-68709325e43c",
         "amount": amount,
-        "merchant": merchant_name,
+        "merchantDesc": merchant_name,
+        "merchantAccountNumber": merchant_name,
         "account": {
+            "cardholderName": card_holder_name,
             "number": encrypt(card_number),
-            "monthExp": month_exp,
-            "yearExp": year_exp,
+            "exp": "{}/{}".format(month_exp, year_exp),
             "cvv": encrypt(cvv)
         }
     }
