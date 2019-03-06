@@ -29,7 +29,7 @@ class CreditCardSchema(Schema):
     """
     first_name = fields.Str(required=True, error_messages={'required': 'First name is required.'})
     last_name = fields.Str(required=True, error_messages={'required': 'Last name is required.'})
-    number = fields.Str(required=True, error_messages={'required': 'Credit Card Number is required.'})
+    number = fields.Integer(required=True, error_messages={'required': 'Credit Card Number is required.'})
     exp = fields.Nested(DateSchema)
 
     @validates("exp")
