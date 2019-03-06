@@ -1,17 +1,18 @@
 from threading import Timer
 
+import requests
 from flask import jsonify
 from flask_restplus import Resource, fields, reqparse
-import requests
+
 from app import api_V1
 from app import db
-from app.models.trasactions import Transaction, PENDING, REFUSED
+from app.models.trasactions import Transaction, PENDING
 from app.models.users import Merchant
 from app.schemas import TransactionCreateSchema, TransactionConfirmSchema
+from app.utils.aes import encrypt
 from app.utils.decorators import parse_with, HasApiKey
 from app.utils.genrators import random_with_N_digits
 from app.utils.http_codes import *
-from app.utils.aes import encrypt, decrypt
 
 MERCHANT_API_KEY = "Merchant API_KEY"
 API_KEY = "API_KEY"
@@ -108,7 +109,8 @@ class TransactionResourceCreate(Resource):
                         first_name=trans["credit_card"]["first_name"],
                         last_name=trans["credit_card"]["last_name"],
                         credit_card_number=trans["credit_card"]["number"],
-                        exp=trans["credit_card"]["exp"],
+                        exp_month=trans["credit_card"]["exp"]["month"],
+                        exp_year=trans["credit_card"]["exp"]["year"],
                         cvv=trans["credit_card"]["cvv"],
                         amount=trans["amount"],
                         label=trans["purchase_desc"],

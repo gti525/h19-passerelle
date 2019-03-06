@@ -15,7 +15,7 @@ def valid_credit_card():
    return {
         "first_name": "Sylvain",
         "last_name": "Degue",
-        "number": "1111222233334444",
+        "number": 1111222233334444,
         "cvv": 856,
         "exp": "12/2019",
     }
@@ -38,8 +38,8 @@ class TestDateSchema(object):
 class TestCreditCardSchema(object):
 
     @pytest.mark.parametrize("first_name,last_name, number, cvv, exp", [
-        ("John", "Doe", "1111222233334444", 123, {"month":12,"year":2024}),
-        ("John", "Doe", "1111222233334444", 856, {"month":10,"year":2024}),
+        ("John", "Doe", 1111222233334444, 123, {"month":12,"year":2024}),
+        ("John", "Doe", 1111222233334444, 856, {"month":10,"year":2024}),
     ], ids=["T1", "T2"])
     def test_valid_credit_card(self, first_name, last_name, number, cvv, exp):
         data = {
@@ -53,10 +53,10 @@ class TestCreditCardSchema(object):
 
     @pytest.mark.parametrize("first_name,last_name, number, cvv, exp", [
         ("John", "Doe", None, 123, "12/2024"),
-        ("John", "Doe", "1111222233334444", 456, "1219"),
-        (None, "Doe", "1111222233334444", 678, {"month":12,"year":2024}),
-        ("John", None, "1111222233334444", 912, {"month":12,"year":20249}),
-        ("John", "Doe", "3569380356438091", 321, {"month":12,"year":2024}),
+        ("John", "Doe", 1111222233334444, 456, "1219"),
+        (None, "Doe", 1111222233334444, 678, {"month":12,"year":2024}),
+        ("John", None, 1111222233334444, 912, {"month":12,"year":20249}),
+        ("John", "Doe", 3569380356438091, 321, {"month":12,"year":2024}),
     ], ids=["T1", "T2", "T3", "T4", "T5"])
     def test_invalid_credit_card(self, first_name, last_name, number, cvv, exp):
         data = {
@@ -111,7 +111,7 @@ class TestTransactionSchema(object):
             "credit_card":{
                 "first_name": "Sylvain",
                 "last_name": "Degue",
-                "number": "1111222233334444",
+                "number": 1111222233334444,
                 "cvv": 856,
                 "exp": {"month":12,"year":2024},
             }
@@ -131,7 +131,7 @@ class TestTransactionSchema(object):
             "credit_card":{
                 "first_name": "Sylvain",
                 "last_name": "Degue",
-                "number": "1111222233334444",
+                "number": 1111222233334444,
                 "cvv": 856,
                 "exp": "12/2019",
             }
