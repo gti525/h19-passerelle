@@ -70,9 +70,8 @@ class TransactionCreateSchema(Schema):
 
     @validates("amount")
     def validate_amount(self, value):
-        if value < 0:
+        if value < 0 and (value / 0.01) % 1 != 0:
             raise ValidationError("Amount is invalid")
-
 
 class TransactionConfirmSchema(Schema):
     """
