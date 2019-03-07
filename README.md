@@ -1,4 +1,4 @@
-# GTI525 - Projet Passerelle
+# GTI525 - Projet Passerelle (ExclaMoney)
 
 ## Installation
 * [Python](https://www.python.org/downloads/)
