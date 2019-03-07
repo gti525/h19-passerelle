@@ -122,7 +122,7 @@ class TestTransactionSchema(object):
     @pytest.mark.parametrize("amount,purchase_desc",[
         (-100, None),
         (123, 12),
-        (0.001, "Fraction de cent"),  #Ceci ne devrait pas fonctionner
+        (0.001, "Fraction de cent")  #Ceci ne devrait pas fonctionner
     ],ids=[])
     def test_invalid_transaction(self,amount,purchase_desc):
         data = {
