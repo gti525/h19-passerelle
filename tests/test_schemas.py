@@ -100,7 +100,7 @@ class TestMerchantSchema(object):
 class TestTransactionSchema(object):
 
     @pytest.mark.parametrize("amount,purchase_desc",[
-        (500, "De la drogue")
+        (500.00, "De la drogue")
     ],ids=[])
     def test_valid_transaction(self,amount,purchase_desc):
         data = {
@@ -120,7 +120,7 @@ class TestTransactionSchema(object):
 
 
     @pytest.mark.parametrize("amount,purchase_desc",[
-        (-100, None),
+        (-100.00, None),
         (123.01, 12),
         (0.001, "Fraction de cent")  #Ceci ne devrait pas fonctionner
     ],ids=[])
