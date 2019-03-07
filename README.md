@@ -1,8 +1,5 @@
 # GTI525 - Projet Passerelle (ExclaMoney)
 
-##Produit
-* [API](https://h19-passerelle.herokuapp.com/)
-
 ## Installation
 * [Python](https://www.python.org/downloads/)
 * [Flask](http://flask.pocoo.org/docs/1.0/installation/)
