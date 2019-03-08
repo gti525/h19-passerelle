@@ -100,7 +100,7 @@ class TransactionResourceCreate(Resource):
                                          trans["credit_card"]["exp"]["year"],
                                          )
 
-                if r.status_code == 200:
+                if r.status_code == 201:
                     t = Transaction(
                         id=random_with_N_digits(10),
                         first_name=trans["credit_card"]["first_name"],
@@ -143,22 +143,33 @@ class TransactionResourceConfirmation(Resource):
 
 
 def preauthorize_payment(card_holder_name, amount, merchant_name, card_number, cvv, month_exp, year_exp):
-    url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
-    headers = {"X-API-KEY": "15489123311"}
-    data = {
-        "amount": amount,
-        "merchantDesc": merchant_name,
-        "merchantAccountNumber": merchant_name,
-        "account": {
-            "cardholderName": card_holder_name,
-            "number": encrypt(card_number),
-            "exp": "{}/{}".format(month_exp, year_exp),
-            "cvv": encrypt(cvv)
+    idBank = int(str(card_number)[:4])
+    if idBank == 5105:
+        ##Pour communiquer avec banque2
+        url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
+        headers = {"X-API-KEY": "15489123311"}
+        data = {
+            "amount": amount,
+            "merchantDesc": merchant_name,
+            "merchantAccountNumber": merchant_name,
+            "account": {
+                "cardholderName": card_holder_name,
+                "number": encrypt(card_number),
+                "exp": "{}/{}".format(month_exp, year_exp),
+                "cvv": encrypt(cvv)
+            }
         }
-    }
-    r = requests.post(url, headers=headers, data=data)
+        r = requests.post(url, headers=headers, data=data)
+        return r
+    elif idBank == 1111:
+        ##Pour communiquer avec banque1 configuration temporaire
+        return jsonify({"result": "ACCEPTED", "transactionId": random_with_N_digits(10)}), 201
+    else:
+        ##Pour les autres cas
+        return jsonify({"result": "ACCEPTED", "transactionId": random_with_N_digits(10)}), 201
 
-    return r
+
+
 
 
 def cancel_transaction_timer(trans_num):
