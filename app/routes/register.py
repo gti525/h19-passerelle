@@ -25,7 +25,7 @@ def register():
 
             db.session.add(user)
             db.session.commit()
-            flash("Utilisateur créer")
+            flash("Utilisateur créé")
             return redirect('dashboard')
         return render_template('register.html', title='Register', form=form)
     else:
