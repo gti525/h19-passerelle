@@ -92,8 +92,10 @@ class TransactionResourceCreate(Resource):
 
             if transaction_valid:
 
-                r = preauthorize_payment(trans["amount"],
-                                         merchant.name,
+                r = preauthorize_payment(trans["first_name"] + " " + trans["last_name"], ##card_holder_name
+                                         trans["amount"],
+                                         trans["purchase_desc"], ##merchant_desc
+                                         trans["Merchant"]["id"], ##Pour le merchant_account_number à revalider
                                          trans["credit_card"]["number"],
                                          trans["credit_card"]["cvv"],
                                          trans["credit_card"]["exp"]["month"],
@@ -142,7 +144,7 @@ class TransactionResourceConfirmation(Resource):
         return jsonify({"result": SUCCESS})
 
 
-def preauthorize_payment(card_holder_name, amount, merchant_name, card_number, cvv, month_exp, year_exp):
+def preauthorize_payment(card_holder_name, amount, merchant_desc, merchant_account_number, card_number, cvv, month_exp, year_exp):
     idBank = int(str(card_number)[:4])
     if idBank == 5105:
         ##Pour communiquer avec banque2
@@ -150,8 +152,8 @@ def preauthorize_payment(card_holder_name, amount, merchant_name, card_number, c
         headers = {"X-API-KEY": "15489123311"}
         data = {
             "amount": amount,
-            "merchantDesc": merchant_name,
-            "merchantAccountNumber": merchant_name,
+            "merchantDesc": merchant_desc,
+            "merchantAccountNumber": merchant_account_number,
             "account": {
                 "cardholderName": card_holder_name,
                 "number": encrypt(card_number),
