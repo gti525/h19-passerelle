@@ -9,8 +9,10 @@ from app import db
 from app.consts import *
 from app.models.trasactions import Transaction, PENDING
 from app.models.users import Merchant
+import app.bank2 as bank2
+import app.bank1 as bank1
 from app.schemas import TransactionCreateSchema, TransactionConfirmSchema
-from app.utils.aes import encrypt
+from app.utils.aes import encrypt,decrypt
 from app.utils.decorators import parse_with, HasApiKey
 from app.utils.genrators import random_with_N_digits
 
@@ -51,8 +53,9 @@ cancellation_model = tn.model('Transaction cancellation', {
 })
 
 # Model for transaction confirmation
-confirmation_model = tn.model('Transaction confirmation', {
+ProcessTransaction = tn.model('Transaction process', {
     'transaction_number': fields.String(required=True, example="1234567890"),
+    "action": fields.String(description='Action', enum=[CONFIRM_TRANS, CANCEL_TRANS]),
     MERCHANT_API_KEY: fields.String(required=True, example="98765431235465"),
 })
 
@@ -63,7 +66,7 @@ success_transaction_modal = tn.model('Sucessful transaction', {
 })
 
 api_parser = reqparse.RequestParser()
-api_parser.add_argument('API_KEY')
+api_parser.add_argument(MERCHANT_API_KEY)
 
 
 @tn.route("/create")
@@ -92,7 +95,7 @@ class TransactionResourceCreate(Resource):
 
             if transaction_valid:
 
-                r = preauthorize_payment(trans["amount"],
+                r = bank2.preauthorize_payment(trans["amount"],
                                          merchant.name,
                                          trans["credit_card"]["number"],
                                          trans["credit_card"]["cvv"],
@@ -133,32 +136,30 @@ class TransactionResourceConfirmation(Resource):
     """
 
     @HasApiKey(api_parser)
-    @tn.expect(confirmation_model)
+    @tn.expect(ProcessTransaction)
     @tn.response(200, SUCCESS)
     @tn.response(400, INVALID)
     @tn.response(401, UNAUTHORIZED_ACCESS)
     @parse_with(TransactionConfirmSchema(strict=True))
     def post(self, **kwargs):
+
+        api_key = kwargs["entity"][MERCHANT_API_KEY]
+        transaction_number = kwargs["entity"]["transaction_number"]
+        action = kwargs["entity"]["action"]
+
+        transaction = Transaction.query.get(transaction_number)
+        merchant = Merchant.query.filter_by(api_key=api_key).first()
+
+        if transaction and merchant:
+            card_number = decrypt(transaction.credit_card_number)
+            #TODO Check for Bank1 or 2
+
+            #TODO CHeckf for confirmation
+
+            #TODO Make fund transfer
+
         return jsonify({"result": SUCCESS})
 
-
-def preauthorize_payment(card_holder_name, amount, merchant_name, card_number, cvv, month_exp, year_exp):
-    url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
-    headers = {"X-API-KEY": "15489123311"}
-    data = {
-        "amount": amount,
-        "merchantDesc": merchant_name,
-        "merchantAccountNumber": merchant_name,
-        "account": {
-            "cardholderName": card_holder_name,
-            "number": encrypt(card_number),
-            "exp": "{}/{}".format(month_exp, year_exp),
-            "cvv": encrypt(cvv)
-        }
-    }
-    r = requests.post(url, headers=headers, data=data)
-
-    return r
 
 
 def cancel_transaction_timer(trans_num):
