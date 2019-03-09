@@ -95,7 +95,7 @@ class TransactionResourceCreate(Resource):
                 r = preauthorize_payment(trans["first_name"] + " " + trans["last_name"], ##card_holder_name
                                          trans["amount"],
                                          trans["purchase_desc"], ##merchant_desc
-                                         trans["Merchant"]["id"], ##Pour le merchant_account_number à revalider
+                                         merchant.account_number,
                                          trans["credit_card"]["number"],
                                          trans["credit_card"]["cvv"],
                                          trans["credit_card"]["exp"]["month"],
@@ -145,34 +145,23 @@ class TransactionResourceConfirmation(Resource):
 
 
 def preauthorize_payment(card_holder_name, amount, merchant_desc, merchant_account_number, card_number, cvv, month_exp, year_exp):
-    idBank = int(str(card_number)[:4])
-    if idBank == 5105:
-        ##Pour communiquer avec banque2
-        url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
-        headers = {"X-API-KEY": "15489123311"}
-        data = {
-            "amount": amount,
-            "merchantDesc": merchant_desc,
-            "merchantAccountNumber": merchant_account_number,
-            "account": {
-                "cardholderName": card_holder_name,
-                "number": encrypt(card_number),
-                "exp": "{}/{}".format(month_exp, year_exp),
-                "cvv": encrypt(cvv)
-            }
+    #1111 4 premier chiffre banque1
+    #5105 4 premier chiffre banque2
+    url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
+    headers = {"X-API-KEY": "15489123311"}
+    data = {
+        "amount": amount,
+        "merchantDesc": merchant_desc,
+        "merchantAccountNumber": merchant_account_number,
+        "account": {
+            "cardholderName": card_holder_name,
+            "number": encrypt(card_number),
+            "exp": "{}/{}".format(month_exp, year_exp),
+            "cvv": encrypt(cvv)
         }
-        r = requests.post(url, headers=headers, data=data)
-        return r
-    elif idBank == 1111:
-        ##Pour communiquer avec banque1 configuration temporaire
-        return jsonify({"result": "ACCEPTED", "transactionId": random_with_N_digits(10)}), 201
-    else:
-        ##Pour les autres cas
-        return jsonify({"result": "ACCEPTED", "transactionId": random_with_N_digits(10)}), 201
-
-
-
-
+    }
+    r = requests.post(url, headers=headers, data=data)
+    return r
 
 def cancel_transaction_timer(trans_num):
     """
