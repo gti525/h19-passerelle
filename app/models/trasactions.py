@@ -3,7 +3,7 @@ from app import db
 PENDING = "Pending"
 AUTHORIZED = "Authorized"
 REFUSED = "Refused"
-VERIFIED = "Verified"
+CANCELED = "Canceled"
 
 
 class Transaction(db.Model):
@@ -30,3 +30,25 @@ class Transaction(db.Model):
     def authorize(self):
         """Change status to authorized"""
         self.status = AUTHORIZED
+
+    def cancel(self):
+        """Change status to canceled"""
+        self.status = CANCELED
+
+
+class TransactionRepository():
+
+    @staticmethod
+    def create(self, **kwargs):
+        t = Transaction(**kwargs)
+        db.session.add(t)
+        db.session.commit()
+
+        return t
+
+    @staticmethod
+    def update(self, transaction):
+        db.session.add(transaction)
+        db.session.commit()
+
+        return transaction
