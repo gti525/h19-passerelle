@@ -4,6 +4,8 @@ import luhn
 from marshmallow import Schema
 from marshmallow import fields, validates, ValidationError
 
+from app.consts import *
+
 
 class DateSchema(Schema):
     """
@@ -62,7 +64,7 @@ class TransactionCreateSchema(Schema):
     """
     Transaction attributes use during the creation of a transaction
     """
-    API_KEY = fields.Str(required=True, error_messages={'required': 'API_KEY is required.'})
+    MERCHANT_API_KEY = fields.Str(required=True, error_messages={'required': 'API_KEY is required.'})
     amount = fields.Number(required=True, error_messages={'required': 'Amount is required.'})
     purchase_desc = fields.Str(required=True, error_messages={'required': 'Purchase description is required.'})
     credit_card = fields.Nested(CreditCardSchema)
@@ -73,8 +75,16 @@ class TransactionCreateSchema(Schema):
         if value < 0 or (value / 0.01) % 1 != 0:
             raise ValidationError("Amount is invalid")
 
-class TransactionConfirmSchema(Schema):
+
+class TransactionProcessSchema(Schema):
     """
     Transaction schemas for confirm a transaction
     """
-    transaction_number = fields.Str(required=True, error_messages={"required": " Transaction is required"})
+    transaction_number = fields.Integer(required=True, error_messages={"required": " Transaction is required"})
+    action = fields.Str(required=True, error_messages={"required": " Transaction is required"})
+    MERCHANT_API_KEY = fields.Str(required=True, error_messages={'required': 'MERCHANT_API_KEY is required.'})
+
+    @validates("action")
+    def validate_amount(self, value):
+        if value not in [CONFIRM_TRANS, CANCEL_TRANS]:
+            raise ValidationError("action is invalid")

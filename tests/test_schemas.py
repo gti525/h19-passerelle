@@ -1,5 +1,6 @@
 import pytest
 
+from app.consts import *
 from app.schemas import *
 
 
@@ -104,7 +105,7 @@ class TestTransactionSchema(object):
     ],ids=[])
     def test_valid_transaction(self,amount,purchase_desc):
         data = {
-            'API_KEY':"sdfsadgsadgas",
+            MERCHANT_API_KEY: "sdfsadgsadgas",
             "amount": amount,
             "purchase_desc": purchase_desc,
             "merchant": {"name": "Elvis", "id": "fhvg"},
@@ -138,3 +139,33 @@ class TestTransactionSchema(object):
             }
         }
         assert TransactionCreateSchema().validate(data=data) != {}
+
+
+class TestTransactionProcessSchema(object):
+
+    @pytest.mark.parametrize("api_key,action,trans_id", [
+        ("2135235125", CANCEL_TRANS, 23152352523),
+        ("2135235125", CONFIRM_TRANS, 23152352523)
+    ], ids=[])
+    def test_valid_process(self, api_key, action, trans_id):
+        data = {
+            "MERCHANT_API_KEY": api_key,
+            "action": action,
+            "transaction_number": trans_id
+        }
+
+        assert TransactionProcessSchema().validate(data=data) == {}
+
+    @pytest.mark.parametrize("api_key,action,trans_id", [
+        ("2135235125", CANCEL_TRANS, None),
+        ("2135235125", "okok", 23152352523),
+        (None, CANCEL_TRANS, 23152352523)
+    ], ids=[])
+    def test_invalid_process(self, api_key, action, trans_id):
+        data = {
+            "MERCHANT_API_KEY": api_key,
+            "action": action,
+            "transaction_number": trans_id
+        }
+
+        assert TransactionProcessSchema().validate(data=data) != {}

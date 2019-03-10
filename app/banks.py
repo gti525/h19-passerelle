@@ -1,6 +1,7 @@
 import requests
 
 from app.consts import BANK2_BASE_URL
+from app.utils import genrators
 from app.utils.aes import encrypt
 
 BANK1_ID = 1111
@@ -28,11 +29,21 @@ def call_real_bank(bank_id, action=None, **kwargs):
         elif bank_id == BANK2_ID:
             response = Bank2.process_transaction(**kwargs)
 
-    return response
+    try:
+        response.raise_for_status()
+        return response.status_code, response.json()
+
+    except requests.HTTPError:
+        return response.status_code, {}
 
 
 def call_fake_bank(action=None, **kwargs):
-    pass
+    code = 200
+    resp_data = {}
+    if action == PRE_AUTHORIZE_TRANS_ACTION:
+        resp_data["transactionId"] = genrators.random_with_N_digits(12)
+
+    return code, resp_data
 
 
 class Bank:
@@ -47,9 +58,6 @@ class Bank:
 
 class Bank2(Bank):
 
-    def __init__(self):
-        self.id = BANK2_ID
-
     def pre_authorize_transaction(self, card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
         url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
         headers = {"X-API-KEY": "15489123311"}
@@ -63,6 +71,16 @@ class Bank2(Bank):
                 "exp": "{}/{}".format(month_exp, year_exp),
                 "cvv": encrypt(cvv)
             }
+        }
+        r = requests.post(url, headers=headers, data=data)
+        return r
+
+    def process_transaction(self, bank_transaction_id, action):
+        url = BANK2_BASE_URL + "/api/v1/paymentGateway/process"
+        headers = {"X-API-KEY": "15489123311"}
+        data = {
+            "transactionID": bank_transaction_id,
+            "action": action
         }
         r = requests.post(url, headers=headers, data=data)
         return r

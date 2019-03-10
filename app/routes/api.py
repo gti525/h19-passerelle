@@ -8,7 +8,7 @@ from app.banks import *
 from app.consts import *
 from app.models.trasactions import Transaction, PENDING, TransactionRepository
 from app.models.users import Merchant
-from app.schemas import TransactionCreateSchema, TransactionConfirmSchema
+from app.schemas import TransactionCreateSchema, TransactionProcessSchema
 from app.utils.aes import decrypt
 from app.utils.decorators import parse_with, HasApiKey
 from app.utils.genrators import random_with_N_digits
@@ -95,7 +95,7 @@ class TransactionResourceCreate(Resource):
                 bank_id = get_bank_id(trans["credit_card"]["number"])
                 trans_data = {
                     "card_holder_name": "{} {} ".format(trans["credit_card"]["first_name"],
-                                                        trans["credit_card"]["first_name"]),
+                                                        trans["credit_card"]["last_name"]),
                     "amount": trans["amount"],
                     "merchant": merchant,
                     "card_number": trans["credit_card"]["number"],
@@ -105,15 +105,12 @@ class TransactionResourceCreate(Resource):
                 }
 
                 if bank_id == BANKX_ID:
-                    response, transaction_number = call_fake_bank(action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
-
-                    valid = response == True and transaction_number is not None
+                    status_code, resp_data = call_fake_bank(action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
                 else:
-                    response = call_real_bank(bank_id, action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
-                    valid = response is not None and (response.status_code == 201 or response.status_code) == 200
+                    status_code, resp_data = call_real_bank(bank_id, action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
-                if valid:
+                if status_code == 200 and "transactionId" in resp_data is not None:
                     t = TransactionRepository.create({
                         "id": random_with_N_digits(10),
                         "first_name": trans["credit_card"]["first_name"],
@@ -125,7 +122,7 @@ class TransactionResourceCreate(Resource):
                         "amount": trans["amount"],
                         "label": trans["purchase_desc"],
                         "merchant_id": trans["merchant"]["id"],
-                        "bank_transaction_id": response.json()["transactionId"]
+                        "bank_transaction_id": resp_data["transactionId"]
                     })
 
                     cancel_transaction_timer(t.id)
@@ -148,7 +145,7 @@ class TransactionResourceConfirmation(Resource):
     @tn.response(200, SUCCESS)
     @tn.response(400, INVALID)
     @tn.response(403, UNAUTHORIZED_ACCESS)
-    @parse_with(TransactionConfirmSchema(strict=True))
+    @parse_with(TransactionProcessSchema(strict=True))
     def post(self, **kwargs):
         try:
             api_key = kwargs["entity"][MERCHANT_API_KEY]
@@ -161,17 +158,15 @@ class TransactionResourceConfirmation(Resource):
             if transaction is not None and merchant is not None:
                 card_number = decrypt(transaction.credit_card_number)
                 bank_id = get_bank_id(card_number)
-                trans_data = {}
-                if bank_id == BANKX_ID:
-                    response, transaction_number = call_fake_bank(action=PROCESS_TRANS_ACTION, **trans_data)
+                trans_data = {"bank_transaction_id": transaction_number, "action": action}
 
-                    valid = response == True and transaction_number is not None
+                if bank_id == BANKX_ID:
+                    status_code, resp_data = call_fake_bank(action=PROCESS_TRANS_ACTION, **trans_data)
 
                 else:
-                    response = call_real_bank(bank_id, action=PROCESS_TRANS_ACTION, **trans_data)
-                    valid = response is not None and (response.status_code == 201 or response.status_code) == 200
+                    status_code, resp_data = call_real_bank(bank_id, action=PROCESS_TRANS_ACTION, **trans_data)
 
-                if valid:
+                if status_code == 200 or status_code == 201:
 
                     if action == CANCEL_TRANS:
                         transaction.cancel()
