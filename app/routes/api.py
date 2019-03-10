@@ -126,12 +126,12 @@ class TransactionResourceCreate(Resource):
                     })
 
                     cancel_transaction_timer(t.id)
-                    return jsonify({"result": SUCCESS, "transaction_number": t.id}), 200
+                    return prepare_response(jsonify({"result": SUCCESS, "transaction_number": t.id}),200)
 
             else:
-                return jsonify({"result": INVALID}), 400
+                return prepare_response(jsonify({"result": INVALID}), 400)
         except ValueError:
-            return jsonify({"result": INVALID}), 400
+            return prepare_response(jsonify({"result": INVALID}), 400)
 
 
 @tn.route("/process")
@@ -175,11 +175,11 @@ class TransactionResourceConfirmation(Resource):
 
                     TransactionRepository.update(transaction)
 
-                    return jsonify({"result": SUCCESS}), 200
-            return jsonify({"result": INVALID}), 400
+                    return prepare_response(jsonify({"result": SUCCESS}), 200)
+            return prepare_response(jsonify({"result": INVALID}), 400)
 
         except ValueError:
-            return jsonify({"result": INVALID}), 400
+            return prepare_response(jsonify({"result": INVALID}), 400)
 
 
 def cancel_transaction_timer(trans_num):
@@ -198,3 +198,9 @@ def cancel_transaction_timer(trans_num):
 
     t = Timer(RESERVATION_TIME, func, kwargs={"trans_num": trans_num})
     t.start()
+
+
+def prepare_response(data,code):
+    response = data
+    response.status_code = code
+    return  response

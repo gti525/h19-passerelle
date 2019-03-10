@@ -6,6 +6,10 @@ from marshmallow import fields, validates, ValidationError
 
 from app.consts import *
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class DateSchema(Schema):
     """
@@ -17,11 +21,13 @@ class DateSchema(Schema):
     @validates("month")
     def validate_exp(self, value):
         if 1 < value < 12:
+            logger.error("Month is invalid")
             raise ValidationError("Month is invalid")
 
     @validates("year")
     def validate_exp(self, value):
         if value < datetime.today().year and value < 2000:
+            logger.error("Year is invalid")
             raise ValidationError("Year is invalid")
 
 
@@ -41,17 +47,20 @@ class CreditCardSchema(Schema):
             month = value["month"]
             year = value["year"]
         except:
+            logger.error("Expiration date is invalid")
             raise ValidationError("Expiration date is invalid")
 
         same_year = year == datetime.today().year
         month_invalid_same_year = month < datetime.today().month
 
         if same_year and month_invalid_same_year:
+            logger.error("Expiration date is invalid")
             raise ValidationError("Expiration date is invalid")
 
     @validates("number")
     def validate_credit_card_number(self, value):
         if not luhn.verify(str(value)):
+            logger.error("CreditCard number is invalid")
             raise ValidationError("CreditCard number is invalid")
 
 
@@ -73,6 +82,7 @@ class TransactionCreateSchema(Schema):
     @validates("amount")
     def validate_amount(self, value):
         if value < 0 or (value / 0.01) % 1 != 0:
+            logger.error("Amount is invalid")
             raise ValidationError("Amount is invalid")
 
 
@@ -87,4 +97,5 @@ class TransactionProcessSchema(Schema):
     @validates("action")
     def validate_amount(self, value):
         if value not in [CONFIRM_TRANS, CANCEL_TRANS]:
+            logger.error("action is invalid")
             raise ValidationError("action is invalid")
