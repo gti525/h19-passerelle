@@ -92,15 +92,17 @@ class TransactionResourceCreate(Resource):
 
             if transaction_valid:
 
-                r = preauthorize_payment(trans["amount"],
-                                         merchant.name,
+                r = preauthorize_payment(trans["first_name"] + " " + trans["last_name"], ##card_holder_name
+                                         trans["amount"],
+                                         trans["purchase_desc"], ##merchant_desc
+                                         merchant.account_number,
                                          trans["credit_card"]["number"],
                                          trans["credit_card"]["cvv"],
                                          trans["credit_card"]["exp"]["month"],
                                          trans["credit_card"]["exp"]["year"],
                                          )
 
-                if r.status_code == 200:
+                if r.status_code == 201:
                     t = Transaction(
                         id=random_with_N_digits(10),
                         first_name=trans["credit_card"]["first_name"],
@@ -142,13 +144,15 @@ class TransactionResourceConfirmation(Resource):
         return jsonify({"result": SUCCESS})
 
 
-def preauthorize_payment(card_holder_name, amount, merchant_name, card_number, cvv, month_exp, year_exp):
+def preauthorize_payment(card_holder_name, amount, merchant_desc, merchant_account_number, card_number, cvv, month_exp, year_exp):
+    #1111 4 premier chiffre banque1
+    #5105 4 premier chiffre banque2
     url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
     headers = {"X-API-KEY": "15489123311"}
     data = {
         "amount": amount,
-        "merchantDesc": merchant_name,
-        "merchantAccountNumber": merchant_name,
+        "merchantDesc": merchant_desc,
+        "merchantAccountNumber": merchant_account_number,
         "account": {
             "cardholderName": card_holder_name,
             "number": encrypt(card_number),
@@ -157,9 +161,7 @@ def preauthorize_payment(card_holder_name, amount, merchant_name, card_number, c
         }
     }
     r = requests.post(url, headers=headers, data=data)
-
     return r
-
 
 def cancel_transaction_timer(trans_num):
     """
