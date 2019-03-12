@@ -1,4 +1,5 @@
 from app import db
+from app.models.base import TimestampMixin
 
 PENDING = "Pending"
 AUTHORIZED = "Authorized"
@@ -6,7 +7,7 @@ REFUSED = "Refused"
 VERIFIED = "Verified"
 
 
-class Transaction(db.Model):
+class Transaction(TimestampMixin,db.Model):
     """
     Transaction table
     """

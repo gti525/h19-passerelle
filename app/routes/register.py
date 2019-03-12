@@ -21,8 +21,10 @@ def register():
             if form.userType.data == 'admin':
                 user = Admin(email=form.email.data, password=encrypt(form.password.data), type=form.userType.data)
             else:
-                user = Merchant( email=form.email.data, password=encrypt(form.password.data), type=form.userType.data, name=form.username.data,
-                                 api_key=encrypt(str(random_with_N_digits(2))+form.email.data +form.username.data), account_number=form.account_number.data)
+                user = Merchant(email=form.email.data, password=encrypt(form.password.data), type=form.userType.data,
+                                name=form.username.data,
+                                api_key=encrypt(str(random_with_N_digits(2)) + form.email.data + form.username.data),
+                                account_number=form.account_number.data)
 
             db.session.add(user)
             db.session.commit()
@@ -34,12 +36,12 @@ def register():
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Nom', validators=[DataRequired()], )
+    username = StringField('Nom', validators=[DataRequired()])
     account_number = StringField('Compte bancaire', validators=[DataRequired()])
     email = StringField('Courriel', validators=[DataRequired(), Email()])
     password = PasswordField('Mot de passe', validators=[DataRequired()])
     password2 = PasswordField('Validation Mot de passe', validators=[DataRequired(), EqualTo('password')])
-    userType = SelectField(u'Type', choices=[('merchant', 'Marchand'),('admin', 'Administrateur')])
+    userType = SelectField(u'Type', choices=[('merchant', 'Marchand'), ('admin', 'Administrateur')])
     submit = SubmitField('Enregistrer')
 
     def validate_email(self, email):
