@@ -15,22 +15,35 @@
     function drawChart() {
        var transaction = {{ recentTransactions }};
        var date = new Date();
+
         var data = google.visualization.arrayToDataTable([
-            ['Journée', 'Transactions'],
-            [date.removeDays(3).toLocaleDateString("en-CA"), transaction[3]],
-            [date.removeDays(2).toLocaleDateString("en-CA"), transaction[2]],
-            [date.removeDays(1).toLocaleDateString("en-CA"), transaction[1]],
-            [date.toLocaleDateString("en-CA"), transaction[0]]
-        ]);
+         ['Journée', 'Volume', { role: 'style' }],
+         [date.removeDays(3).toLocaleDateString("en-CA"),transaction[3], 'red'],
+         [date.removeDays(2).toLocaleDateString("en-CA"), transaction[2], 'blue'],
+         [date.removeDays(1).toLocaleDateString("en-CA"), transaction[1], 'yellow'],
+         [date.toLocaleDateString("en-CA"), transaction[0], 'green' ],
+      ]);
 
-        var options = {
-            title: 'Volume des transactions dans les 4 derniers jours',
-            //curveType: 'function',
-            legend: { position: 'bottom' }
-        };
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       2]);
 
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+      var options = {
+        title: "Volume des transactions 4 derniers jours",
+        width: 500,
+        height: 350,
+        bar: {groupWidth: "60%"},
+        legend: { position: "none" },
+      };
 
+        var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart'));
+        chart.draw(view, options);
+
+        {% if type == 'admin' %}
         var transactionsByMerchant = {{ transactionsByMerchant | tojson }};
         var value = Object.values(transactionsByMerchant);
         var key = Object.keys(transactionsByMerchant);
@@ -52,9 +65,29 @@
         // Instantiate and draw our chart, passing in some options.
         var chart1 = new google.visualization.PieChart(document.getElementById('chart_div'));
         chart1.draw(data1, options1);
+        {% else %}
+        var data2 = new google.visualization.DataTable();
+        data2.addColumn('string', 'Status');
+        data2.addColumn('number', 'Nombre de transactions');
+        data2.addRows([
+            ["Accepted", 21313],
+            ["gay", 123]
+        ]);
 
-        chart.draw(data, options);
+        // Set chart options
+        var options2 = {
+            'title': 'Répartition des transactions par status',
+            'width': 500,
+            'height': 400
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart2 = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart2.draw(data2, options2);
+        {% endif %}
     }
+
+
 
 
 
@@ -129,25 +162,24 @@
             <div style="padding: 20px" align="center" class="card">
                 <div class="row">
                     <div class="left card-title">
-                        <b>Transactions récentes</b>
+                        <b>Volume des transactions</b>
                     </div>
                 </div>
                 <div id="curve_chart" style="width: 750px; height: 350px"></div>
             </div>
         </div>
-        {% if type == 'admin' %}
         <div class="col s6">
             <div style="padding: 20px" align="center" class="card">
                 <div class="row">
                     <div class="left card-title">
-                        <b>Transactions par marchand</b>
+                        <b>Transactions par {%if type == 'admin' %} vendeurs {% else %} status {% endif %}</b>
                     </div>
                 </div>
                 <div id="chart_div"></div>
             </div>
         </div>
     </div>
-    {% endif %}
+
 </main>
 
 {% endblock %}
