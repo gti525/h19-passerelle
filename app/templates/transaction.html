@@ -66,12 +66,15 @@
         var chart1 = new google.visualization.PieChart(document.getElementById('chart_div'));
         chart1.draw(data1, options1);
         {% else %}
+        var transactionByStatus = {{ transactionByStatus }};
         var data2 = new google.visualization.DataTable();
         data2.addColumn('string', 'Status');
         data2.addColumn('number', 'Nombre de transactions');
         data2.addRows([
-            ["Accepted", 21313],
-            ["gay", 123]
+            ["Pending", transactionByStatus[0]],
+            ["Authorized", transactionByStatus[1]],
+            ["Refused", transactionByStatus[2]],
+            ["Verified", transactionByStatus[3]]
         ]);
 
         // Set chart options
@@ -86,6 +89,7 @@
         chart2.draw(data2, options2);
         {% endif %}
     }
+
 
 
 
