@@ -24,7 +24,7 @@ def transaction():
             d = date.today() - timedelta(x)
             recentTransactions.append(Transaction.query.filter_by(created=d).count())
         transactionsByMerchant = {}
-        merchant01 = Merchant.query.filter_by(id=vente01_id).first()
+        merchant01 = Merchant.query.get(vente01_id)
         merchant02 = Merchant.query.filter_by(id=vente02_id).first()
         transactionsByMerchant[merchant01.name] = Transaction.query.filter_by(merchant_id=vente01_id).count()
         transactionsByMerchant[merchant02.name] = Transaction.query.filter_by(merchant_id=vente02_id).count()
