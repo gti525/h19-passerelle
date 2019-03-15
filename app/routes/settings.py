@@ -15,7 +15,7 @@ def settings():
     if current_user.is_authenticated:
         form = RegistrationForm()
         if form.validate_on_submit():
-            if not form.username == None:
+            if form.username:
                 current_user.name = form.username.data
             if not form.password.data == "":
                 current_user.password = encrypt(form.password.data)
