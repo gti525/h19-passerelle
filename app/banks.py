@@ -3,6 +3,9 @@ import requests
 from app.consts import BANK2_BASE_URL
 from app.utils import genrators
 from app.utils.aes import encrypt
+import logging
+
+logger = logging.getLogger(__name__)
 
 BANK1_ID = 1111
 BANK2_ID = 5105
@@ -33,17 +36,26 @@ def call_real_bank(bank_id, action=None, **kwargs):
         response.raise_for_status()
         return response.status_code, response.json()[0]
 
-    except requests.HTTPError:
+    except requests.HTTPError as e:
+        logger.error("HTTPError status-code={}  message={}".format(response.status_code,str(e)))
+        return response.status_code, {}
+    except Exception as e:
+        logger.error("Exception".format(str(e)))
         return response.status_code, {}
 
 
 def call_fake_bank(action=None, **kwargs):
     code = 200
     resp_data = {}
-    if action == PRE_AUTHORIZE_TRANS_ACTION:
-        resp_data["transactionId"] = genrators.random_with_N_digits(12)
 
-    return code, resp_data
+    try:
+        if action == PRE_AUTHORIZE_TRANS_ACTION:
+            resp_data["transactionId"] = genrators.random_with_N_digits(12)
+
+        return code, resp_data
+    except Exception as e :
+        logger.error("Exception message={}".format(str(e)))
+        return 400, {}
 
 
 class Bank:

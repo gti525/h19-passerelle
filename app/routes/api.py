@@ -13,6 +13,10 @@ from app.utils.aes import decrypt
 from app.utils.decorators import parse_with, HasApiKey
 from app.utils.genrators import random_with_N_digits
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 RESERVATION_TIME = 900  # 15 minutes in seconds
 
 tn = api_V1.namespace('transaction', description='Transaction operations')
@@ -129,8 +133,14 @@ class TransactionResourceCreate(Resource):
                     return prepare_response(jsonify({"result": SUCCESS, "transaction_number": t.id}),200)
 
             else:
+                logger.error("Transaction invalid")
                 return prepare_response(jsonify({"result": INVALID}), 400)
-        except ValueError:
+        except ValueError as e:
+            logger.error("ValueError error occured. message={}".format(str(e)))
+            return prepare_response(jsonify({"result": INVALID}), 400)
+
+        except Exception as e :
+            logger.error("Exception error occured. message={}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID}), 400)
 
 
@@ -176,9 +186,15 @@ class TransactionResourceConfirmation(Resource):
                     TransactionRepository.update(transaction)
 
                     return prepare_response(jsonify({"result": SUCCESS}), 200)
+
+            logger.error("Confirmation invalid")
             return prepare_response(jsonify({"result": INVALID}), 400)
 
-        except ValueError:
+        except ValueError as e:
+            logger.error("ValueError error occured. message={}".format(str(e)))
+            return prepare_response(jsonify({"result": INVALID}), 400)
+        except Exception as e:
+            logger.error("Exception error occured. message={}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID}), 400)
 
 
@@ -195,9 +211,11 @@ def cancel_transaction_timer(trans_num):
             if trans is not None and trans.status == PENDING:
                 trans.refuse()
                 TransactionRepository.update(trans)
+                logger.error("Transaction {} cancelled".format(trans_num))
 
     t = Timer(RESERVATION_TIME, func, kwargs={"trans_num": trans_num})
     t.start()
+    logger.error("Timer started for transaction {}".format(trans_num))
 
 
 def prepare_response(data,code):
