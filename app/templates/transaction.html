@@ -1,31 +1,93 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<!-- merchant -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
     google.charts.load('current', { 'packages': ['corechart'] });
     google.charts.setOnLoadCallback(drawChart);
 
+    Date.prototype.removeDays = function(days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() - days);
+    return date;
+    }
+
     function drawChart() {
+       var transaction = {{ recentTransactions }};
+       var date = new Date();
+
         var data = google.visualization.arrayToDataTable([
-            ['Journée', 'Transactions'],
-            ['02-05', 100],
-            ['02-06', 310],
-            ['02-07', 400],
-            ['02-08', 450]
+         ['Journée', 'Volume', { role: 'style' }],
+         [date.removeDays(3).toLocaleDateString("en-CA"),transaction[3], 'red'],
+         [date.removeDays(2).toLocaleDateString("en-CA"), transaction[2], 'blue'],
+         [date.removeDays(1).toLocaleDateString("en-CA"), transaction[1], 'yellow'],
+         [date.toLocaleDateString("en-CA"), transaction[0], 'green' ],
+      ]);
+
+        var view = new google.visualization.DataView(data);
+        view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       2]);
+
+      var options = {
+        title: "Volume des transactions 4 derniers jours",
+        width: 500,
+        height: 350,
+        bar: {groupWidth: "60%"},
+        legend: { position: "none" },
+      };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart'));
+        chart.draw(view, options);
+
+        {% if type == 'admin' %}
+        var transactionsByMerchant = {{ transactionsByMerchant | tojson }};
+        var value = Object.values(transactionsByMerchant);
+        var key = Object.keys(transactionsByMerchant);
+        var data1 = new google.visualization.DataTable();
+        data1.addColumn('string', 'Nom du marchand');
+        data1.addColumn('number', 'Nombre de transactions');
+        data1.addRows([
+            [key[0], value[0]],
+            [key[1],value[1]]
         ]);
 
-        var options = {
-            title: 'Volume des transactions dans les 4 derniers jours',
-            curveType: 'function',
-            legend: { position: 'bottom' }
+        // Set chart options
+        var options1 = {
+            'title': 'Répartition des transactions par marchand',
+            'width': 500,
+            'height': 400
         };
 
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+        // Instantiate and draw our chart, passing in some options.
+        var chart1 = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart1.draw(data1, options1);
+        {% else %}
+        var transactionByStatus = {{ transactionByStatus }};
+        var data2 = new google.visualization.DataTable();
+        data2.addColumn('string', 'Status');
+        data2.addColumn('number', 'Nombre de transactions');
+        data2.addRows([
+            ["Pending", transactionByStatus[0]],
+            ["Authorized", transactionByStatus[1]],
+            ["Refused", transactionByStatus[2]],
+            ["Verified", transactionByStatus[3]]
+        ]);
 
-        chart.draw(data, options);
+        // Set chart options
+        var options2 = {
+            'title': 'Répartition des transactions par status',
+            'width': 500,
+            'height': 400
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart2 = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart2.draw(data2, options2);
+        {% endif %}
     }
 
 
@@ -35,13 +97,7 @@
 
 
 
-
-
-
-
 </script>
-
-<!-- fake data-->
 
 <main>
 
@@ -56,14 +112,15 @@
                 <div class="row">
                     <ul class="pagination">
                         <li class="disabled">
-                            <a href="transactionsMerchant.html"><i class="material-icons">chevron_left</i></a>
+                            <a href={{ url_for('transaction.transaction')}}><i
+                                class="material-icons">chevron_left</i></a>
                         </li>
                         <li class="active"><a href={{ url_for('transaction.transaction')}}>1</a></li>
                         <li class="waves-effect"><a href={{ url_for('transaction.transaction')}}>2</a></li>
                         <li class="waves-effect"><a href={{ url_for('transaction.transaction')}}>3</a></li>
                         <li class="waves-effect">
                             <a href={{ url_for('transaction.transaction')}}>
-                                <i class="material-icons">chevron_right</i>
+                            <i class="material-icons">chevron_right</i>
                             </a>
                         </li>
                     </ul>
@@ -104,69 +161,12 @@
 
     </div>
     <!-- end merchant -->
-    <!-- fake data-->
-    <script type="text/javascript">
-    google.charts.load('current', { 'packages': ['corechart'] });
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-            ['Journée', 'Transactions'],
-            ['02-05', 560],
-            ['02-06', 671],
-            ['02-07', 850],
-            ['02-08', 1400]
-        ]);
-
-        var options = {
-            title: 'Volume des transactions dans les 4 derniers jours',
-            curveType: 'function',
-            legend: { position: 'bottom' }
-        };
-
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-        var data1 = new google.visualization.DataTable();
-        data1.addColumn('string', 'Nom du marchand');
-        data1.addColumn('number', 'Nombre de transactions');
-        data1.addRows([
-            ['Tim Horton', 8500],
-            ['Evenko', 3800],
-            ['Stubhub', 12001],
-            ['Kijiji', 2031],
-            ['FB MarketPlace', 751]
-        ]);
-
-        // Set chart options
-        var options1 = {
-            'title': 'Répartition des transactions par marchand dernier mois',
-            'width': 500,
-            'height': 400
-        };
-
-        // Instantiate and draw our chart, passing in some options.
-        var chart1 = new google.visualization.PieChart(document.getElementById('chart_div'));
-        chart1.draw(data1, options1);
-
-        chart.draw(data, options);
-    }
-
-
-
-
-
-
-
-
-    </script>
-
-    <!-- fake data-->
     <div class="row">
         <div class="col s6">
             <div style="padding: 20px" align="center" class="card">
                 <div class="row">
                     <div class="left card-title">
-                        <b>Transactions récentes</b>
+                        <b>Volume des transactions</b>
                     </div>
                 </div>
                 <div id="curve_chart" style="width: 750px; height: 350px"></div>
@@ -176,13 +176,14 @@
             <div style="padding: 20px" align="center" class="card">
                 <div class="row">
                     <div class="left card-title">
-                        <b>Transactions par marchand</b>
+                        <b>Transactions par {%if type == 'admin' %} vendeurs {% else %} status {% endif %}</b>
                     </div>
                 </div>
                 <div id="chart_div"></div>
             </div>
         </div>
     </div>
+
 </main>
 
 {% endblock %}
