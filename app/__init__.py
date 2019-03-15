@@ -1,4 +1,5 @@
 import os
+from logging.config import dictConfig
 
 from dotenv import load_dotenv
 from flask import Flask
@@ -6,6 +7,23 @@ from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
 from flask_login import LoginManager
+
+
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
 
 load_dotenv()
 
@@ -64,7 +82,5 @@ def create_app(config=None):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(user_id)
-
-
 
     return app
