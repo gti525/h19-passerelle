@@ -72,5 +72,6 @@ class Merchant(User):
             self.email,
             self.type,
             self.name,
+            self.status,
             self.api_key
         )
