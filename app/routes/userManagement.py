@@ -17,6 +17,7 @@ def userManagement():
         return render_template("userManagement.html", merchants=merchants)
     else:
         return redirect('login')
+        flash("you are not connected. Please login")
 
 
 @userManagement_bp.route("/delete", methods=['GET'])
