@@ -31,7 +31,7 @@ db = SQLAlchemy()
 
 api_bp = Blueprint('api', __name__,url_prefix="/api")
 api_V1 = Api(app=api_bp, prefix="/v1", version='1.0', title='PaymentGateway - API',
-             description='Passerelle de paiement - GTI525:H19',
+             description='Passerelle de paiement - GTI525:H19',doc='/doc/'
              )
 
 

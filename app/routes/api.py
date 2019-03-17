@@ -81,7 +81,10 @@ class TransactionResourceCreate(Resource):
     @HasApiKey(api_parser)
     @parse_with(TransactionCreateSchema(strict=True), arg_name="transaction")
     def post(self, **kwargs):
-        transaction = Transaction(**kwargs["transaction"])
+        credit_card = kwargs["transaction"]["credit_card"]
+        label = kwargs["transaction"]["purchase_desc"]
+        amount = kwargs["transaction"]["amount"]
+        transaction = Transaction(credit_card=credit_card, label=label, amount=amount)
         merchant_api_key = kwargs[MERCHANT_API_KEY]
         transaction_valid = True
 
@@ -125,11 +128,11 @@ class TransactionResourceCreate(Resource):
             logger.error("ValueError error occured. message={}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID}), 400)
 
-        except Exception as e :
+        except Exception as e:
             logger.error("Exception error occured. message={}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID}), 400)
 
-
+processed_transaction = "processed_transaction"
 @tn.route("/process")
 class TransactionResourceConfirmation(Resource):
     """
@@ -141,12 +144,12 @@ class TransactionResourceConfirmation(Resource):
     @tn.response(200, SUCCESS)
     @tn.response(400, INVALID)
     @tn.response(403, UNAUTHORIZED_ACCESS)
-    @parse_with(TransactionProcessSchema(strict=True))
+    @parse_with(TransactionProcessSchema(strict=True),arg_name=processed_transaction)
     def post(self, **kwargs):
         try:
-            api_key = kwargs["entity"][MERCHANT_API_KEY]
-            transaction_number = kwargs["entity"]["transaction_number"]
-            action = kwargs["entity"]["action"]
+            api_key = kwargs[processed_transaction][MERCHANT_API_KEY]
+            transaction_number = kwargs[processed_transaction]["transaction_number"]
+            action = kwargs[processed_transaction]["action"]
 
             transaction = Transaction.query.get(transaction_number)
             merchant = Merchant.query.filter_by(api_key=api_key).first()
@@ -204,7 +207,7 @@ def cancel_transaction_timer(trans_num):
     logger.error("Timer started for transaction {}".format(trans_num))
 
 
-def prepare_response(data,code):
+def prepare_response(data, code):
     response = data
     response.status_code = code
-    return  response
+    return response
