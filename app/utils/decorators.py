@@ -55,16 +55,7 @@ def parse_with(schema, arg_name='entity', **kwargs):
             json = request.get_json() or {}
             try:
                 entity, errors = schema.load(json, **kwargs)
-                transaction = {
-                    "first_name": entity["credit_card"]["first_name"],
-                    "last_name": entity["credit_card"]["last_name"],
-                    "credit_card_number": entity["credit_card"]["number"],
-                    "exp_month": entity["credit_card"]["exp"]["month"],
-                    "exp_year": entity["credit_card"]["exp"]["year"],
-                    "cvv": entity["credit_card"]["cvv"],
-                    "amount": entity["amount"],
-                    "label": entity["purchase_desc"]
-                }
+
             except ValidationError as e:
                 logger.error("parse_with: {}".format(str(e)))
                 abort(400, INVALID)
@@ -76,7 +67,7 @@ def parse_with(schema, arg_name='entity', **kwargs):
                 logger.error("parse_with: {}".format(str(e)))
                 abort(400, INVALID)
 
-            fkwargs.update({arg_name: transaction, MERCHANT_API_KEY: entity[MERCHANT_API_KEY]})
+            fkwargs.update({arg_name: entity, MERCHANT_API_KEY: entity[MERCHANT_API_KEY]})
             return f(*fargs, **fkwargs)
 
         return inner
