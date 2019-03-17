@@ -1,9 +1,10 @@
+import logging
+
 import requests
 
 from app.consts import BANK2_BASE_URL
 from app.utils import genrators
 from app.utils.aes import encrypt
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -60,11 +61,11 @@ def call_fake_bank(action=None, **kwargs):
 
 class Bank:
     @staticmethod
-    def pre_authorize_transaction(self, card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
+    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
         pass
 
     @staticmethod
-    def process_transaction(self, bank_transaction_id, action):
+    def process_transaction(bank_transaction_id, action):
         pass
 
 
