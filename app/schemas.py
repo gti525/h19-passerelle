@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 import luhn
@@ -5,8 +6,6 @@ from marshmallow import Schema
 from marshmallow import fields, validates, ValidationError
 
 from app.consts import *
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +37,7 @@ class CreditCardSchema(Schema):
     first_name = fields.Str(required=True, error_messages={'required': 'First name is required.'})
     last_name = fields.Str(required=True, error_messages={'required': 'Last name is required.'})
     number = fields.Integer(required=True, error_messages={'required': 'Credit Card Number is required.'})
+    cvv = fields.Str(required=True, error_messages={'required': 'CVV is required.'})
     exp = fields.Nested(DateSchema)
 
     @validates("exp")
@@ -62,6 +62,13 @@ class CreditCardSchema(Schema):
         if not luhn.verify(str(value)):
             logger.error("CreditCard number is invalid")
             raise ValidationError("CreditCard number is invalid")
+
+    @validates("cvv")
+    def validates_cvv(self, value):
+        error = "CVV is invalid"
+        if len(value) != 3:
+            logger.error(error)
+            raise ValidationError(error)
 
 
 class MerchantSchema(Schema):
