@@ -1,3 +1,4 @@
+import logging
 from threading import Timer
 
 from flask import jsonify
@@ -11,9 +12,6 @@ from app.models.users import Merchant
 from app.schemas import TransactionCreateSchema, TransactionProcessSchema
 from app.utils.aes import decrypt
 from app.utils.decorators import parse_with, HasApiKey
-from app.utils.genrators import random_with_N_digits
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -30,8 +28,8 @@ date_model = tn.model('Expiration date', {
 credit_card_model = tn.model('Credit Card', {
     'first_name': fields.String(required=True, example="John"),
     'last_name': fields.String(required=True, example="Doe"),
-    'number': fields.Integer(required=True, example=1111222233334444),
-    'cvv': fields.Integer(required=True, example=765),
+    'number': fields.Integer(required=True, example=4551464693977947),
+    'cvv': fields.Integer(required=True, example="765"),
     'exp': fields.Nested(date_model),
 })
 
@@ -41,7 +39,7 @@ merchant_model = tn.model("Merchant", {
 })
 
 transaction_model = tn.model('Transactions', {
-    MERCHANT_API_KEY: fields.String(required=True, example="1234567890"),
+    MERCHANT_API_KEY: fields.String(required=True, example="12345"),
     'amount': fields.Integer(min=0, required=True, example=100),
     'purchase_desc': fields.String(required=True, example="PURCHASE/ Simons "),
     'credit_card': fields.Nested(credit_card_model),
@@ -81,59 +79,47 @@ class TransactionResourceCreate(Resource):
     @tn.response(400, INVALID)
     @tn.response(403, UNAUTHORIZED_ACCESS)
     @HasApiKey(api_parser)
-    @parse_with(TransactionCreateSchema(strict=True))
+    @parse_with(TransactionCreateSchema(strict=True), arg_name="transaction")
     def post(self, **kwargs):
-        trans = kwargs["entity"]
-
+        transaction = Transaction(**kwargs["transaction"])
+        merchant_api_key = kwargs[MERCHANT_API_KEY]
         transaction_valid = True
 
         try:
             # Validate API KEY
-            merchant = Merchant.query.filter_by(api_key=trans[MERCHANT_API_KEY]).first()
+            merchant = Merchant.query.filter_by(api_key=merchant_api_key).first()
 
             if merchant is None:
                 transaction_valid = False
+                logger.info("Merchant doesnt exist")
 
             if transaction_valid:
 
-                bank_id = get_bank_id(trans["credit_card"]["number"])
+                transaction.set_merchant(merchant)
+                bank_id = get_bank_id(transaction.credit_card_number)
                 trans_data = {
-                    "card_holder_name": "{} {} ".format(trans["credit_card"]["first_name"],
-                                                        trans["credit_card"]["last_name"]),
-                    "amount": trans["amount"],
+                    "card_holder_name": "{} {} ".format(transaction.first_name, transaction.last_name),
+                    "amount": transaction.amount,
                     "merchant": merchant,
-                    "card_number": trans["credit_card"]["number"],
-                    "cvv": trans["credit_card"]["cvv"],
-                    "month_exp": trans["credit_card"]["exp"]["month"],
-                    "year_exp": trans["credit_card"]["exp"]["year"]
+                    "card_number": transaction.credit_card_number,
+                    "cvv": transaction.cvv,
+                    "month_exp": transaction.exp_month,
+                    "year_exp": transaction.exp_year
                 }
 
                 if bank_id == BANKX_ID:
                     status_code, resp_data = call_fake_bank(action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
-
                 else:
                     status_code, resp_data = call_real_bank(bank_id, action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
                 if status_code == 200 and "transactionId" in resp_data is not None:
-                    t = TransactionRepository.create({
-                        "id": random_with_N_digits(10),
-                        "first_name": trans["credit_card"]["first_name"],
-                        "last_name": trans["credit_card"]["last_name"],
-                        "credit_card_number": trans["credit_card"]["number"],
-                        "exp_month": trans["credit_card"]["exp"]["month"],
-                        "exp_year": trans["credit_card"]["exp"]["year"],
-                        "cvv": trans["credit_card"]["cvv"],
-                        "amount": trans["amount"],
-                        "label": trans["purchase_desc"],
-                        "merchant_id": trans["merchant"]["id"],
-                        "bank_transaction_id": resp_data["transactionId"]
-                    })
-
-                    cancel_transaction_timer(t.id)
-                    return prepare_response(jsonify({"result": SUCCESS, "transaction_number": t.id}),200)
+                    transaction.set_bank_trans_id(resp_data["transactionId"])
+                    cancel_transaction_timer(transaction.id)
+                    TransactionRepository.update(transaction)
+                    return prepare_response(jsonify({"result": SUCCESS, "transaction_number": transaction.id}), 200)
 
             else:
-                logger.error("Transaction invalid")
+                logger.info("Transaction invalid")
                 return prepare_response(jsonify({"result": INVALID}), 400)
         except ValueError as e:
             logger.error("ValueError error occured. message={}".format(str(e)))
