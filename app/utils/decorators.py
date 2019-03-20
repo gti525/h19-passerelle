@@ -4,8 +4,11 @@ from flask import request
 from flask_restplus import reqparse, abort
 from marshmallow import ValidationError
 
-from app.consts import MERCHANT_API_KEY
+from app.consts import *
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 def parse_request(*args,**kwargs):
     """
@@ -51,10 +54,15 @@ def parse_with(schema, arg_name='entity', **kwargs):
             json = request.get_json() or {}
             try:
                 entity, errors = schema.load(json, **kwargs)
-            except ValidationError:
-                abort(400,"Invalid body request")
-            except ValueError:
-                abort(400,"Invalid body request")
+            except ValidationError as e:
+                abort(400, INVALID)
+                logger.error("parse_with: {}".format(str(e)))
+            except ValueError as e:
+                abort(400, INVALID)
+                logger.error("parse_with: {}".format(str(e)))
+            except Exception as e:
+                logger.error("parse_with: {}".format(str(e)))
+
 
             fkwargs.update({arg_name: entity})
             return f(*fargs, **fkwargs)
@@ -69,7 +77,9 @@ def HasApiKey(parser):
             args = parser.parse_args()
             if args[MERCHANT_API_KEY]:
                 return f(*fargs, **fkwargs)
-            abort(401,message="Unauthorized access")
+            abort(403, message=UNAUTHORIZED_ACCESS)
+            logger.error("HasApiKey: MERCHANT_API_KEY missing")
+
         return inner
 
     return decorator

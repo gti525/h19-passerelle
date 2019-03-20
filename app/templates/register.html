@@ -3,17 +3,24 @@
 <!-- Création d'usager par  administrateur -->
 <main>
     <h4 align="center">Création d'un usager</h4>
-    <div class="container">
+    <div class="container" onload="hidee()">
         <form action="" method="post">
             {{ form.hidden_tag() }}
             <p>
                 {{ form.userType.label }}<br>
-                {{ form.userType }}<br>
+                {{ form.userType(**{'onchange':'hidee()'}) }}<br>
             </p>
             <p>
                 {{ form.username.label }}<br>
                 {{ form.username(size=32) }}<br>
                 {% for error in form.username.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.account_number.label }}<br>
+                {{ form.account_number(size=32) }}<br>
+                {% for error in form.account_number.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
             </p>
