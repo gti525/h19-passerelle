@@ -67,11 +67,9 @@ class Merchant(User):
     }
 
     def __repr__(self):
-        return (
-            self.password,
-            self.email,
-            self.type,
+        return "<Merchant name:{}, email:{}, status:{}, api_key:{}>".format(
             self.name,
+            self.email,
             self.status,
             self.api_key
         )
