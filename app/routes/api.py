@@ -1,4 +1,3 @@
-import logging
 from threading import Timer
 
 from flask import jsonify
@@ -116,9 +115,9 @@ class TransactionResourceCreate(Resource):
                     status_code, resp_data = call_real_bank(bank_id, action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
                 if status_code == 200 and "transactionId" in resp_data is not None:
+                    TransactionRepository.create(transaction=transaction)
                     transaction.set_bank_trans_id(resp_data["transactionId"])
                     cancel_transaction_timer(transaction.id)
-                    TransactionRepository.update(transaction)
                     return prepare_response(jsonify({"result": SUCCESS, "transaction_number": transaction.id}), 200)
 
             else:

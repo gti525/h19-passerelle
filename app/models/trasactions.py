@@ -1,7 +1,11 @@
+import logging
+
 from app import db
 from app.models.base import TimestampMixin
 from app.utils.aes import encrypt
 from app.utils.genrators import random_with_N_digits
+
+logger = logging.getLogger(__name__)
 
 PENDING = "Pending"
 AUTHORIZED = "Authorized"
@@ -13,7 +17,7 @@ class Transaction(TimestampMixin,db.Model):
     """
     Transaction table
     """
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     credit_card_number = db.Column(db.String(20), nullable=False)
@@ -21,10 +25,10 @@ class Transaction(TimestampMixin,db.Model):
     exp_year = db.Column(db.String, nullable=False)
     amount = db.Column(db.Float, nullable=False)
     label = db.Column(db.String(50), nullable=False)
-    merchant_id = db.Column(db.Integer, db.ForeignKey('merchant.id'),
+    merchant_id = db.Column(db.BigInteger, db.ForeignKey('merchant.id'),
                             nullable=False)
     status = db.Column(db.String(15), nullable=False, default=PENDING)
-    bank_transaction_id = db.Column(db.Integer, nullable=False)
+    bank_transaction_id = db.Column(db.BigInteger, nullable=False)
 
     def __init__(self, credit_card=None, amount=None, label=None):
         self.id = random_with_N_digits(8)
@@ -39,7 +43,7 @@ class Transaction(TimestampMixin,db.Model):
 
             if credit_card["exp"]:
                 self.exp_month = credit_card["exp"]["month"]
-                self.exp_month = credit_card["exp"]["year"]
+                self.exp_year = credit_card["exp"]["year"]
 
     def set_merchant(self, merchant):
         self.merchant_id = merchant.id
@@ -66,16 +70,20 @@ class Transaction(TimestampMixin,db.Model):
 class TransactionRepository:
 
     @staticmethod
-    def create(**kwargs):
-        t = Transaction(**kwargs)
-        db.session.add(t)
-        db.session.commit()
+    def create(transaction=None, **kwargs):
+        if transaction is None:
+            transaction = Transaction(**kwargs)
 
-        return t
+        db.session.add(transaction)
+        db.session.commit()
+        logger.info("Transaction created")
+        return transaction
 
     @staticmethod
     def update(transaction):
         db.session.add(transaction)
         db.session.commit()
+        logger.info("Transaction updated")
+
 
         return transaction
