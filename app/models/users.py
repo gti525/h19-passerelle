@@ -2,6 +2,9 @@ from app import db
 from app.models.base import TimestampMixin
 
 
+ACTIVE = "active"
+INACTIVE = "inactive"
+
 class User(TimestampMixin,db.Model):
     """
 
@@ -56,6 +59,7 @@ class Merchant(User):
     name = db.Column(db.String(120), unique=True, nullable=False)
     api_key = db.Column(db.String(120), unique=True, nullable=False)
     account_number = db.Column(db.String(120), unique=True, nullable=False)
+    status = db.Column(db.String(120), unique=False, nullable=False, default=ACTIVE)
     db.relationship('Transaction', backref='merchant', lazy=True)
 
     __mapper_args__ = {
@@ -68,5 +72,6 @@ class Merchant(User):
             self.email,
             self.type,
             self.name,
+            self.status,
             self.api_key
         )

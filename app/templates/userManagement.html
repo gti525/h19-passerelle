@@ -7,41 +7,24 @@
             <thead>
             <tr>
                 <th>Nom</th>
-                <th>Statut</th>
                 <th>Modifier</th>
                 <th>Supprimer</th>
             </tr>
             </thead>
-
             <tbody>
+            {% for merchant in merchants %}
             <tr>
-                <td>Evenko</td>
-                <td>Actif</td>
-                <td><a class="waves-effect waves-light btn" href={{ url_for('userModify.userModify')}}>Modifier</a></td>
-                <td><a class="waves-effect waves-light btn red"
-                       onclick="confirm('Voulez-vous vraiment Supprimer')">Supprimer</a></td>
+                <td>{{merchant.name}}</td>
+                <td>
+                    <a class="waves-effect waves-light btn" href={{ url_for('userModify.userModify',
+                    merchantId=merchant.id) }}>Modifier</a>
+                </td>
+                <td>
+                <a class="waves-effect waves-light btn red" onclick="return confirm('Êtes-vous certain')" href={{ url_for('userManagement.userDelete',
+                merchantId=merchant.id) }}>Supprimer</a>
+                </td>
             </tr>
-            <tr>
-                <td>StubHub</td>
-                <td>Actif</td>
-                <td><a class="waves-effect waves-light btn" href={{ url_for('userModify.userModify')}}>Modifier</a></td>
-                <td><a class="waves-effect waves-light btn red"
-                       onclick="confirm('Voulez-vous vraiment Supprimer')">Supprimer</a></td>
-            </tr>
-            <tr>
-                <td>Tim Hortons</td>
-                <td>Actif</td>
-                <td><a class="waves-effect waves-light btn" href={{ url_for('userModify.userModify')}}>Modifier</a></td>
-                <td><a class="waves-effect waves-light btn red"
-                       onclick="confirm('Voulez-vous vraiment Supprimer')">Supprimer</a></td>
-            </tr>
-            <tr>
-                <td>Facebook Marketplace</td>
-                <td>Inactif</td>
-                <td><a class="waves-effect waves-light btn" href={{ url_for('userModify.userModify')}}>Modifier</a></td>
-                <td><a class="waves-effect waves-light btn red"
-                       onclick="confirm('Voulez-vous vraiment Supprimer')">Supprimer</a></td>
-            </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>
