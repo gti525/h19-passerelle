@@ -1,4 +1,5 @@
 import functools
+import logging
 
 from flask import request
 from flask_restplus import reqparse, abort
@@ -6,11 +7,10 @@ from marshmallow import ValidationError
 
 from app.consts import *
 
-import logging
-
 logger = logging.getLogger(__name__)
 
-def parse_request(*args,**kwargs):
+
+def parse_request(*args, **kwargs):
     """
     Decorator used to parse request
     :param args: list of Arguments (flask_restful.reqparse.Argument)
@@ -48,32 +48,37 @@ def parse_with(schema, arg_name='entity', **kwargs):
     :param arg_name will be inserted as a keyword argument containing the
         deserialized data.
     """
+
     def decorator(f):
         @functools.wraps(f)
         def inner(*fargs, **fkwargs):
             json = request.get_json() or {}
             try:
                 entity, errors = schema.load(json, **kwargs)
+
             except ValidationError as e:
+                logger.error("parse_with: {}".format(str(e)))
                 abort(400, INVALID)
                 logger.error("parse_with: {}".format(str(e)))
             except ValueError as e:
-                abort(400, INVALID)
                 logger.error("parse_with: {}".format(str(e)))
+                abort(400, INVALID)
             except Exception as e:
                 logger.error("parse_with: {}".format(str(e)))
+                abort(400, INVALID)
 
-
-            fkwargs.update({arg_name: entity})
+            fkwargs.update({arg_name: entity, MERCHANT_API_KEY: entity[MERCHANT_API_KEY]})
             return f(*fargs, **fkwargs)
+
         return inner
+
     return decorator
+
 
 def HasApiKey(parser):
     def decorator(f):
         @functools.wraps(f)
         def inner(*fargs, **fkwargs):
-
             args = parser.parse_args()
             if args[MERCHANT_API_KEY]:
                 return f(*fargs, **fkwargs)

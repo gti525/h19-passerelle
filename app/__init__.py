@@ -2,7 +2,7 @@ import os
 from logging.config import dictConfig
 
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, Blueprint
 from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
@@ -28,8 +28,10 @@ dictConfig({
 load_dotenv()
 
 db = SQLAlchemy()
-api_V1 = Api(version='1.0', title='PaymentGateway - API',
-             description='Passerelle de paiement - GTI525:H19',
+
+api_bp = Blueprint('api', __name__,url_prefix="/api")
+api_V1 = Api(app=api_bp, prefix="/v1", version='1.0', title='PaymentGateway - API',
+             description='Passerelle de paiement - GTI525:H19',doc='/doc/'
              )
 
 
@@ -60,10 +62,9 @@ def create_app(config=None):
     from app.routes.errors import page_not_found, page_error
 
     from app.routes.api import tn
-
     api_V1.add_namespace(tn)
-    api_V1.init_app(app)
 
+    app.register_blueprint(api_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(login_bp)
     app.register_blueprint(dashboard_bp)
