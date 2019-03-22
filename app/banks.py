@@ -1,5 +1,6 @@
 import requests
 
+from app.consts import BANK1_BASE_URL
 from app.consts import BANK2_BASE_URL
 from app.utils import genrators
 from app.utils.aes import encrypt
@@ -99,8 +100,24 @@ class Bank2(Bank):
 
 
 class Bank1(Bank):
-    # TODO wating for bank1 ...
-    pass
+    def pre_authorize_transaction(self, card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
+        url = BANK1_BASE_URL + "/api/v1/autorisation"
+        data = {
+            #still need to split names to call correctly
+            "prenom": card_holder_name,
+            "nom": card_holder_name,
+            "numeroDeCarte": card_number,
+            "moisExpiration": month_exp,
+            "anneeExpiration": year_exp,
+            "cvv": cvv,
+            "montant": ammount,
+            #need to import description from merchant call
+            "description": "Description de la transaction",
+            #need to get api key
+            "apiKey": "Elo1#himEssa"
+        }
+        r = requests.post(url, headers=headers, data=data)
+        return r
 
 
 def get_bank_id(number):
