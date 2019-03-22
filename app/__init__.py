@@ -1,5 +1,6 @@
 import os
 from logging.config import dictConfig
+from flask_cors import CORS
 
 from dotenv import load_dotenv
 from flask import Flask, Blueprint
@@ -38,6 +39,8 @@ api_V1 = Api(app=api_bp, prefix="/v1", version='1.0', title='PaymentGateway - AP
 def create_app(config=None):
     app = Flask(__name__)
     # app.wsgi_app = ProxyFix(app.wsgi_app)
+
+    cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     if config is None:
         config = os.getenv('APP_SETTINGS')  # config_name = "development"
