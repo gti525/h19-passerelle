@@ -28,7 +28,7 @@ class Transaction(TimestampMixin,db.Model):
     merchant_id = db.Column(db.BigInteger, db.ForeignKey('merchant.id'),
                             nullable=False)
     status = db.Column(db.String(15), nullable=False, default=PENDING)
-    bank_transaction_id = db.Column(db.BigInteger, nullable=False)
+    bank_transaction_id = db.Column(db.BigInteger, nullable=True)
 
     def __init__(self, credit_card=None, amount=None, label=None):
         self.id = random_with_N_digits(8)
