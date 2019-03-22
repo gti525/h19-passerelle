@@ -70,8 +70,8 @@ class Bank:
 
 
 class Bank2(Bank):
-
-    def pre_authorize_transaction(self, card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
+    @staticmethod
+    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
         url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
         headers = {"X-API-KEY": "15489123311"}
         data = {
@@ -88,7 +88,8 @@ class Bank2(Bank):
         r = requests.post(url, headers=headers, data=data)
         return r
 
-    def process_transaction(self, bank_transaction_id, action):
+    @staticmethod
+    def process_transaction(bank_transaction_id, action):
         url = BANK2_BASE_URL + "/api/v1/paymentGateway/process"
         headers = {"X-API-KEY": "15489123311"}
         data = {
