@@ -99,6 +99,7 @@ class Bank2(Bank):
         return r
 
 
+#will all need to be redone when bank1 gives us updated doc files
 class Bank1(Bank):
     def pre_authorize_transaction(self, card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
         url = BANK1_BASE_URL + "/api/v1/autorisation"
@@ -114,6 +115,16 @@ class Bank1(Bank):
             #need to import description from merchant call
             "description": "Description de la transaction",
             #need to get api key
+            "apiKey": "Elo1#himEssa"
+        }
+        r = requests.post(url, headers=headers, data=data)
+        return r
+
+    def process_transaction(self, bank_transaction_id, action):
+        url = BANK1_BASE_URL + "/api/v1/*unknown*"
+        data = {
+            "transactionID": bank_transaction_id,
+            "action": action,
             "apiKey": "Elo1#himEssa"
         }
         r = requests.post(url, headers=headers, data=data)
