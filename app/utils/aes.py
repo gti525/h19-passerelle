@@ -8,7 +8,7 @@ cipher = AES.new(ENCRYPTION_KEY, AES.MODE_CBC, ENCRYPTION_KEY)
 
 
 def encrypt(text):
-    text = text.encode("utf-8")
+    text = str(text).encode("utf-8")
     cipher = AES.new(ENCRYPTION_KEY, AES.MODE_CBC, ENCRYPTION_KEY)
 
     ct_bytes = cipher.encrypt(pad(text, AES.block_size))
