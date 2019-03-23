@@ -29,10 +29,10 @@ def decrypt(text):
             return int(pt)
         else:
             return pt.decode("utf-8")
-    except ValueError:
-        logger.error("Incorrect decryption")
+    except ValueError as e:
+        logger.error("Incorrect decryption {}".format(str(e)))
     except Exception:
-        logger.error("Incorrect decryption")
+        logger.error("Incorrect decryption. {}".format(str(e)))
 
 
 def is_number(s):
