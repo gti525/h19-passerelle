@@ -146,7 +146,7 @@ class TransactionResourceConfirmation(Resource):
     @parse_with(TransactionProcessSchema(strict=True),arg_name=processed_transaction)
     def post(self, **kwargs):
         try:
-            api_key = kwargs[processed_transaction][MERCHANT_API_KEY]
+            api_key = kwargs[MERCHANT_API_KEY]
             transaction_number = kwargs[processed_transaction]["transaction_number"]
             action = kwargs[processed_transaction]["action"]
 
@@ -203,7 +203,7 @@ def cancel_transaction_timer(trans_num):
 
     t = Timer(RESERVATION_TIME, func, kwargs={"trans_num": trans_num})
     t.start()
-    logger.error("Timer started for transaction {}".format(trans_num))
+    logger.info("Timer started for transaction {}".format(trans_num))
 
 
 def prepare_response(data, code):
