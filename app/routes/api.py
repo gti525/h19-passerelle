@@ -39,7 +39,7 @@ merchant_model = tn.model("Merchant", {
 
 transaction_model = tn.model('Transactions', {
     MERCHANT_API_KEY: fields.String(required=True, example="12345"),
-    'amount': fields.Integer(min=0, required=True, example=100),
+    'amount': fields.Number(min=0, required=True, example=100.42),
     'purchase_desc': fields.String(required=True, example="PURCHASE/ Simons "),
     'credit_card': fields.Nested(credit_card_model),
 })
