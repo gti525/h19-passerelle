@@ -192,9 +192,9 @@ def cancel_transaction_timer(trans_num):
     if still PENDING
     """
 
-    def func(id):
-        if id:
-            trans = Transaction.query.get(id)
+    def func(**kwargs):
+        if kwargs["trans_num"]:
+            trans = Transaction.query.get(kwargs["trans_num"])
 
             if trans is not None and trans.status == PENDING:
                 trans.refuse()

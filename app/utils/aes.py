@@ -2,6 +2,9 @@ from base64 import b64decode, b64encode
 
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
+import logging
+
+logger = logging.getLogger(__name__)
 
 ENCRYPTION_KEY = "Buenos933-accole".encode("utf-8")
 cipher = AES.new(ENCRYPTION_KEY, AES.MODE_CBC, ENCRYPTION_KEY)
@@ -22,7 +25,20 @@ def decrypt(text):
         cipher = AES.new(ENCRYPTION_KEY, AES.MODE_CBC, ENCRYPTION_KEY)
         ct = b64decode(text)
         pt = unpad(cipher.decrypt(ct), AES.block_size)
-        return pt.decode("utf-8")
+        if is_number(pt):
+            return int(pt)
+        else:
+            return pt.decode("utf-8")
     except ValueError:
-        print("Incorrect decryption")
+        logger.error("Incorrect decryption")
+    except Exception:
+        logger.error("Incorrect decryption")
 
+
+def is_number(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+    
