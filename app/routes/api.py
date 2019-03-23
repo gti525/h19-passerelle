@@ -28,7 +28,7 @@ credit_card_model = tn.model('Credit Card', {
     'first_name': fields.String(required=True, example="John"),
     'last_name': fields.String(required=True, example="Doe"),
     'number': fields.Integer(required=True, example=4551464693977947),
-    'cvv': fields.Integer(required=True, example="765"),
+    'cvv': fields.String(required=True, example="765"),
     'exp': fields.Nested(date_model),
 })
 
