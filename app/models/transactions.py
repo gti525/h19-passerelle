@@ -45,6 +45,9 @@ class Transaction(TimestampMixin,db.Model):
                 self.exp_month = credit_card["exp"]["month"]
                 self.exp_year = credit_card["exp"]["year"]
 
+    def __repr__(self):
+        return '<Transaction amount={}, created={}, updated={},  />'.format(self.amount, self.created, self.updated)
+
     def set_merchant(self, merchant):
         self.merchant_id = merchant.id
 

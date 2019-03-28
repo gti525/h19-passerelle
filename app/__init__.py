@@ -52,7 +52,7 @@ def create_app(config=None):
     db.init_app(app)
 
     from app.models.users import Admin, Merchant, User
-    from app.models.trasactions import Transaction
+    from app.models.transactions import Transaction
 
     from app.routes.main import main_bp
     from app.routes.login import  login_bp
