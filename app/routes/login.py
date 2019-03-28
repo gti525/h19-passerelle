@@ -20,9 +20,9 @@ def login():
             if registered_user is None:
                 return render_template('login.html', error="Courriel ou mot de passe invalide")
             login_user(registered_user)
-            return redirect('dashboard')
+            return redirect('transaction')
     else:
-        return redirect('dashboard')
+        return redirect('transaction')
 
 
 @login_bp.route("/logout", methods=['GET', 'POST'])

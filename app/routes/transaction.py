@@ -7,8 +7,8 @@ import json
 
 transaction_bp = Blueprint('transaction', __name__, url_prefix='/transaction')
 
-vente01_id = 13
-vente02_id = 15
+vente01 = "vente01"
+vente02 = "vente02"
 
 
 @transaction_bp.route("/", methods=['GET', 'POST'])
@@ -24,10 +24,12 @@ def transaction():
             d = date.today() - timedelta(x)
             recentTransactions.append(Transaction.query.filter_by(created=d).count())
         transactionsByMerchant = {}
-        merchant01 = Merchant.query.get(vente01_id)
-        merchant02 = Merchant.query.get(vente02_id)
-        transactionsByMerchant[merchant01.name] = Transaction.query.filter_by(merchant_id=vente01_id).count()
-        transactionsByMerchant[merchant02.name] = Transaction.query.filter_by(merchant_id=vente02_id).count()
+        merchant01 = Merchant.query.filter_by(name=vente01).first()
+        merchant02 = Merchant.query.filter_by(name=vente02).first()
+        if merchant01:
+            transactionsByMerchant[merchant01.name] = Transaction.query.filter_by(merchant_id=merchant01.id).count()
+        if merchant02:
+            transactionsByMerchant[merchant02.name] = Transaction.query.filter_by(merchant_id=merchant02.id).count()
 
         transactionByStatus = []
         transactionByStatus.append(len([transaction for transaction in transactions if

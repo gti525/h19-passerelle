@@ -53,7 +53,6 @@ def create_app(config=None):
 
     from app.routes.main import main_bp
     from app.routes.login import  login_bp
-    from app.routes.dashboard import dashboard_bp
     from app.routes.settings import settings_bp
     from app.routes.userManagement import userManagement_bp
     from app.routes.userModify import userModify_bp
@@ -67,7 +66,6 @@ def create_app(config=None):
     app.register_blueprint(api_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(login_bp)
-    app.register_blueprint(dashboard_bp)
     app.register_blueprint(settings_bp)
     app.register_blueprint(userManagement_bp)
     app.register_blueprint(userModify_bp)
