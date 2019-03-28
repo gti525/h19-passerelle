@@ -1,4 +1,3 @@
-import logging
 from threading import Timer
 
 from flask import jsonify
@@ -29,7 +28,7 @@ credit_card_model = tn.model('Credit Card', {
     'first_name': fields.String(required=True, example="John"),
     'last_name': fields.String(required=True, example="Doe"),
     'number': fields.Integer(required=True, example=4551464693977947),
-    'cvv': fields.Integer(required=True, example="765"),
+    'cvv': fields.String(required=True, example="765"),
     'exp': fields.Nested(date_model),
 })
 
@@ -40,7 +39,7 @@ merchant_model = tn.model("Merchant", {
 
 transaction_model = tn.model('Transactions', {
     MERCHANT_API_KEY: fields.String(required=True, example="12345"),
-    'amount': fields.Integer(min=0, required=True, example=100),
+    'amount': fields.Float(min=0, required=True, example=100.42),
     'purchase_desc': fields.String(required=True, example="PURCHASE/ Simons "),
     'credit_card': fields.Nested(credit_card_model),
 })
@@ -116,9 +115,9 @@ class TransactionResourceCreate(Resource):
                     status_code, resp_data = call_real_bank(bank_id, action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
                 if status_code == 200 and "transactionId" in resp_data is not None:
+                    TransactionRepository.create(transaction=transaction)
                     transaction.set_bank_trans_id(resp_data["transactionId"])
                     cancel_transaction_timer(transaction.id)
-                    TransactionRepository.update(transaction)
                     return prepare_response(jsonify({"result": SUCCESS, "transaction_number": transaction.id}), 200)
 
             else:
@@ -147,7 +146,7 @@ class TransactionResourceConfirmation(Resource):
     @parse_with(TransactionProcessSchema(strict=True),arg_name=processed_transaction)
     def post(self, **kwargs):
         try:
-            api_key = kwargs[processed_transaction][MERCHANT_API_KEY]
+            api_key = kwargs[MERCHANT_API_KEY]
             transaction_number = kwargs[processed_transaction]["transaction_number"]
             action = kwargs[processed_transaction]["action"]
 
@@ -193,9 +192,9 @@ def cancel_transaction_timer(trans_num):
     if still PENDING
     """
 
-    def func(id):
-        if id:
-            trans = Transaction.query.get(id)
+    def func(**kwargs):
+        if kwargs["trans_num"]:
+            trans = Transaction.query.get(kwargs["trans_num"])
 
             if trans is not None and trans.status == PENDING:
                 trans.refuse()
@@ -204,7 +203,7 @@ def cancel_transaction_timer(trans_num):
 
     t = Timer(RESERVATION_TIME, func, kwargs={"trans_num": trans_num})
     t.start()
-    logger.error("Timer started for transaction {}".format(trans_num))
+    logger.info("Timer started for transaction {}".format(trans_num))
 
 
 def prepare_response(data, code):
