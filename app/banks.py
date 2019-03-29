@@ -103,8 +103,8 @@ class Bank2(Bank):
         return r
 
 
-@staticmethod
 class Bank1(Bank):
+    @staticmethod
     def pre_authorize_transaction(self, card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
         url = BANK1_BASE_URL + "/api/paymentgateway/preauth"
         descBank1 = ''
