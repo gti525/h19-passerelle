@@ -106,30 +106,34 @@ class Bank2(Bank):
 #will all need to be redone when bank1 gives us updated doc files
 class Bank1(Bank):
     def pre_authorize_transaction(self, card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
-        url = BANK1_BASE_URL + "/api/v1/autorisation"
+        url = BANK1_BASE_URL + "/api/paymentgateway/preauth"
+        descBank1 = ''
+        if amount >= 0:
+            descBank1 = 'Achat chez ' + merchant.name
+        else:
+            descBank1 = 'Remboursement en provenance de ' + merchant.name
+        cHolderNames = card_holder_name.split()
+        headers = {"apikey": "FyufTW2r!"}
         data = {
-            #still need to split names to call correctly
-            "prenom": card_holder_name,
-            "nom": card_holder_name,
-            "numeroDeCarte": card_number,
-            "moisExpiration": month_exp,
-            "anneeExpiration": year_exp,
+            "merchantAccountNo": merchant.account_number,
+            "firstname": cHolderNames[0],
+            "lastname": cHolderNames[1],
+            "ccNumber": card_number,
             "cvv": cvv,
-            "montant": ammount,
-            #need to import description from merchant call
-            "description": "Description de la transaction",
-            #need to get api key
-            "apiKey": "Elo1#himEssa"
+            "month": month_exp,
+            "year": year_exp,
+            "amount": amount,
+            "transactionDesc": descBank1
         }
         r = requests.post(url, headers=headers, data=data)
         return r
 
     def process_transaction(self, bank_transaction_id, action):
-        url = BANK1_BASE_URL + "/api/v1/*unknown*"
+        url = BANK1_BASE_URL + "/api/paymentgateway/process"
+        headers = {"apikey": "FyufTW2r!"}
         data = {
             "transactionID": bank_transaction_id,
             "action": action,
-            "apiKey": "Elo1#himEssa"
         }
         r = requests.post(url, headers=headers, data=data)
         return r
