@@ -18,14 +18,13 @@ def cancel_transaction(transaction_id=None):
     DB_PASS = os.environ["DB_PASS"]
     DB_HOST = os.environ["DB_HOST"]
     DB_PORT = os.environ["DB_PORT"]
-    print("About to clear pending transaction...")
+    logger.info("About to clear pending transaction...")
     try:
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, host=DB_HOST, password=DB_PASS)
-        print("Connection successful")
+        logger.info("Connection successful")
     except (Exception, psycopg2.DatabaseError) as error:
-        print(str(error))
+        logger.error(str(error))
 
-        print("I am unable to connect to the database")
 
     cur = conn.cursor()
 
@@ -33,9 +32,14 @@ def cancel_transaction(transaction_id=None):
         cur.execute(
             """UPDATE transaction set status = (CASE WHEN current_date > created + (15 ||' minutes')::interval THEN 
             'Canceled' ELSE 'Pending' END) WHERE id={} ;""".format(transaction_id))
-        print("Transaction pending for more than 15 minutes have been delete")
+        conn.commit()
+        cur.close()
+        rowcount = cur.rowcount
+        if rowcount >=1:
+            logger.info("Transaction {} was set to status Canceled".format(transaction_id))
+        else:
+            logger.info("No rows were affected")
     except (Exception, psycopg2.DatabaseError) as error:
-        print("Cant update")
-        print(str(error))
+        logger.error(str(error))
 
 

@@ -16,17 +16,17 @@ PRE_AUTHORIZE_TRANS_ACTION = "pre_auth"
 PROCESS_TRANS_ACTION = "process"
 
 
-def call_real_bank(bank_id, action=None, **kwargs):
+def call_real_bank(bank_id, act=None, **kwargs):
     response = None
 
-    if action == PRE_AUTHORIZE_TRANS_ACTION:
+    if act == PRE_AUTHORIZE_TRANS_ACTION:
 
         if bank_id == BANK2_ID:
             response = Bank2.pre_authorize_transaction(**kwargs)
         elif bank_id == BANK1_ID:
             response = Bank1.pre_authorize_transaction(**kwargs)
 
-    elif action == PROCESS_TRANS_ACTION:
+    elif act == PROCESS_TRANS_ACTION:
         if bank_id == BANK1_ID:
             response = Bank1.process_transaction(**kwargs)
 
@@ -45,14 +45,15 @@ def call_real_bank(bank_id, action=None, **kwargs):
         return response.status_code, {}
 
 
-def call_fake_bank(action=None, **kwargs):
+def call_fake_bank(act=None, **kwargs):
     code = 200
     resp_data = {}
 
     try:
-        if action == PRE_AUTHORIZE_TRANS_ACTION:
+        if act == PRE_AUTHORIZE_TRANS_ACTION:
             resp_data["transactionId"] = genrators.random_with_N_digits(12)
-
+        elif act == PROCESS_TRANS_ACTION:
+            pass
         return code, resp_data
     except Exception as e :
         logger.error("Exception message={}".format(str(e)))
