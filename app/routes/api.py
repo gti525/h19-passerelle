@@ -6,15 +6,15 @@ from flask_restplus import Resource, fields, reqparse
 from app import api_V1
 from app.banks import *
 from app.consts import *
-from app.models.trasactions import Transaction, PENDING, TransactionRepository
+from app.models.transactions import Transaction, PENDING, TransactionRepository
 from app.models.users import Merchant
 from app.schemas import TransactionCreateSchema, TransactionProcessSchema
 from app.utils.aes import decrypt
 from app.utils.decorators import parse_with, HasApiKey
-
+import tasks
 logger = logging.getLogger(__name__)
 
-RESERVATION_TIME = 900  # 15 minutes in seconds
+RESERVATION_TIME = 960  # 16 minutes in seconds. just in case...
 
 tn = api_V1.namespace('transaction', description='Transaction operations')
 
@@ -193,13 +193,11 @@ def cancel_transaction_timer(trans_num):
     """
 
     def func(**kwargs):
-        if kwargs["trans_num"]:
-            trans = Transaction.query.get(kwargs["trans_num"])
 
-            if trans is not None and trans.status == PENDING:
-                trans.refuse()
-                TransactionRepository.update(trans)
-                logger.error("Transaction {} cancelled".format(trans_num))
+        if kwargs["trans_num"]:
+            logger.info("Canceling transaction {}".format(trans_num))
+
+            tasks.cancel_transaction(kwargs["trans_num"])
 
     t = Timer(RESERVATION_TIME, func, kwargs={"trans_num": trans_num})
     t.start()

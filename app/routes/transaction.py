@@ -1,6 +1,6 @@
 from flask_login import current_user
 from flask import render_template, Blueprint, redirect
-from app.models.trasactions import Transaction
+from app.models.transactions import Transaction
 from datetime import date, timedelta
 from app.models.users import Merchant
 import json
