@@ -88,7 +88,8 @@ class TransactionCreateSchema(Schema):
 
     @validates("amount")
     def validate_amount(self, value):
-        if value < 0 or (value / 0.01) % 1 != 0:
+        y = str(value)
+        if value < 0 or len(y.rsplit('.')[-1]) != 2:
             logger.error("Amount is invalid")
             raise ValidationError("Amount is invalid")
 
