@@ -105,7 +105,7 @@ class Bank2(Bank):
 
 class Bank1(Bank):
     @staticmethod
-    def pre_authorize_transaction(self, card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
+    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
         url = BANK1_BASE_URL + "/api/paymentgateway/preauth"
         descBank1 = ''
         if amount >= 0:
@@ -129,7 +129,7 @@ class Bank1(Bank):
         return r
 
     @staticmethod
-    def process_transaction(self, bank_transaction_id, action):
+    def process_transaction(bank_transaction_id, action):
         url = BANK1_BASE_URL + "/api/paymentgateway/process"
 
         headers = {"apikey": "FyufTW2r!"}
