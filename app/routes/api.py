@@ -111,16 +111,19 @@ class TransactionResourceCreate(Resource):
                 }
 
                 if bank_id == BANKX_ID:
-                    status_code, resp_data = call_fake_bank(action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
-                else:
-                    status_code, resp_data = call_real_bank(bank_id, action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
+                    call_fake_bank(act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
+                    return prepare_response(jsonify({"result": SUCCESS}), 200)
 
-                if status_code == 200 and "transactionId" in resp_data is not None:
-                    transaction.encrypt_data()
-                    TransactionRepository.create(transaction=transaction)
-                    transaction.set_bank_trans_id(resp_data["transactionId"])
-                    cancel_transaction_timer(transaction.id)
-                    return prepare_response(jsonify({"result": SUCCESS, "transaction_number": transaction.id}), 200)
+                else:
+                    status_code, resp_data = call_real_bank(bank_id, act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
+
+                    if status_code == 200 and "transactionId" in resp_data is not None:
+                        transaction.encrypt_data()
+                        TransactionRepository.create(transaction=transaction)
+                        transaction.set_bank_trans_id(resp_data["transactionId"])
+                        cancel_transaction_timer(transaction.id)
+                        return prepare_response(jsonify({"result": SUCCESS, "transaction_number": transaction.id}), 200)
+                return prepare_response(jsonify({"result": INVALID}), 400)
 
             else:
                 logger.info("Transaction invalid")
@@ -161,10 +164,10 @@ class TransactionResourceConfirmation(Resource):
                 trans_data = {"bank_transaction_id": transaction_number, "action": action}
 
                 if bank_id == BANKX_ID:
-                    status_code, resp_data = call_fake_bank(action=PROCESS_TRANS_ACTION, **trans_data)
+                    status_code, resp_data = call_fake_bank(act=PROCESS_TRANS_ACTION, **trans_data)
 
                 else:
-                    status_code, resp_data = call_real_bank(bank_id, action=PROCESS_TRANS_ACTION, **trans_data)
+                    status_code, resp_data = call_real_bank(bank_id, act=PROCESS_TRANS_ACTION, **trans_data)
 
                 if status_code == 200 or status_code == 201:
 

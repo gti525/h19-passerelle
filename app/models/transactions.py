@@ -22,7 +22,7 @@ class Transaction(TimestampMixin,db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
-    credit_card_number = db.Column(db.String(20), nullable=False)
+    credit_card_number = db.Column(db.String(50), nullable=False)
     exp_month = db.Column(db.String, nullable=False)
     exp_year = db.Column(db.String, nullable=False)
     amount = db.Column(db.Float, nullable=False)
