@@ -1,5 +1,7 @@
 import logging
 
+import psycopg2
+
 from app import db
 from app.models.base import TimestampMixin
 from app.utils.aes import encrypt
@@ -74,19 +76,27 @@ class TransactionRepository:
 
     @staticmethod
     def create(transaction=None, **kwargs):
-        if transaction is None:
-            transaction = Transaction(**kwargs)
+        try:
+            if transaction is None:
+                transaction = Transaction(**kwargs)
 
-        db.session.add(transaction)
-        db.session.commit()
-        logger.info("Transaction created")
-        return transaction
+            db.session.add(transaction)
+            db.session.commit()
+            logger.info("Transaction created")
+            return transaction
+        except (Exception, psycopg2.DatabaseError) as error:
+            db.session.rollback()
+            logger.error(str(error))
 
     @staticmethod
     def update(transaction):
-        db.session.add(transaction)
-        db.session.commit()
-        logger.info("Transaction updated")
+        try:
 
+            db.session.add(transaction)
+            db.session.commit()
+            logger.info("Transaction updated")
 
-        return transaction
+            return transaction
+        except (Exception, psycopg2.DatabaseError) as error:
+            db.session.rollback()
+            logger.error(str(error))
