@@ -6,18 +6,16 @@ from flask_restplus import Resource, fields, reqparse
 from app import api_V1
 from app.banks import *
 from app.consts import *
-from app.models.trasactions import Transaction, PENDING, TransactionRepository
+from app.models.transactions import Transaction, PENDING, TransactionRepository
 from app.models.users import Merchant
 from app.schemas import TransactionCreateSchema, TransactionProcessSchema
 from app.utils.aes import decrypt
 from app.utils.decorators import parse_with, HasApiKey
-from app.utils.genrators import random_with_N_digits
-
+import tasks
 import logging
-
 logger = logging.getLogger(__name__)
 
-RESERVATION_TIME = 900  # 15 minutes in seconds
+RESERVATION_TIME = 960  # 16 minutes in seconds. just in case...
 
 tn = api_V1.namespace('transaction', description='Transaction operations')
 
@@ -30,8 +28,8 @@ date_model = tn.model('Expiration date', {
 credit_card_model = tn.model('Credit Card', {
     'first_name': fields.String(required=True, example="John"),
     'last_name': fields.String(required=True, example="Doe"),
-    'number': fields.Integer(required=True, example=1111222233334444),
-    'cvv': fields.Integer(required=True, example=765),
+    'number': fields.Integer(required=True, example=4551464693977947),
+    'cvv': fields.String(required=True, example="765"),
     'exp': fields.Nested(date_model),
 })
 
@@ -41,8 +39,8 @@ merchant_model = tn.model("Merchant", {
 })
 
 transaction_model = tn.model('Transactions', {
-    MERCHANT_API_KEY: fields.String(required=True, example="1234567890"),
-    'amount': fields.Integer(min=0, required=True, example=100),
+    MERCHANT_API_KEY: fields.String(required=True, example="12345"),
+    'amount': fields.Float(min=0, required=True, example=100.42),
     'purchase_desc': fields.String(required=True, example="PURCHASE/ Simons "),
     'credit_card': fields.Nested(credit_card_model),
 })
@@ -81,69 +79,61 @@ class TransactionResourceCreate(Resource):
     @tn.response(400, INVALID)
     @tn.response(403, UNAUTHORIZED_ACCESS)
     @HasApiKey(api_parser)
-    @parse_with(TransactionCreateSchema(strict=True))
+    @parse_with(TransactionCreateSchema(strict=True), arg_name="transaction")
     def post(self, **kwargs):
-        trans = kwargs["entity"]
-
+        credit_card = kwargs["transaction"]["credit_card"]
+        label = kwargs["transaction"]["purchase_desc"]
+        amount = kwargs["transaction"]["amount"]
+        transaction = Transaction(credit_card=credit_card, label=label, amount=amount)
+        merchant_api_key = kwargs[MERCHANT_API_KEY]
         transaction_valid = True
 
         try:
             # Validate API KEY
-            merchant = Merchant.query.filter_by(api_key=trans[MERCHANT_API_KEY]).first()
+            merchant = Merchant.query.filter_by(api_key=merchant_api_key).first()
 
             if merchant is None:
                 transaction_valid = False
+                logger.info("Merchant doesnt exist")
 
             if transaction_valid:
 
-                bank_id = get_bank_id(trans["credit_card"]["number"])
+                transaction.set_merchant(merchant)
+                bank_id = get_bank_id(transaction.credit_card_number)
                 trans_data = {
-                    "card_holder_name": "{} {} ".format(trans["credit_card"]["first_name"],
-                                                        trans["credit_card"]["last_name"]),
-                    "amount": trans["amount"],
+                    "card_holder_name": "{} {} ".format(transaction.first_name, transaction.last_name),
+                    "amount": transaction.amount,
                     "merchant": merchant,
-                    "card_number": trans["credit_card"]["number"],
-                    "cvv": trans["credit_card"]["cvv"],
-                    "month_exp": trans["credit_card"]["exp"]["month"],
-                    "year_exp": trans["credit_card"]["exp"]["year"]
+                    "card_number": transaction.credit_card_number,
+                    "cvv": transaction.cvv,
+                    "month_exp": transaction.exp_month,
+                    "year_exp": transaction.exp_year
                 }
 
                 if bank_id == BANKX_ID:
-                    status_code, resp_data = call_fake_bank(action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
-
+                    status_code, resp_data = call_fake_bank(act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
                 else:
-                    status_code, resp_data = call_real_bank(bank_id, action=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
+                    status_code, resp_data = call_real_bank(bank_id, act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
                 if status_code == 200 and "transactionId" in resp_data is not None:
-                    t = TransactionRepository.create({
-                        "id": random_with_N_digits(10),
-                        "first_name": trans["credit_card"]["first_name"],
-                        "last_name": trans["credit_card"]["last_name"],
-                        "credit_card_number": trans["credit_card"]["number"],
-                        "exp_month": trans["credit_card"]["exp"]["month"],
-                        "exp_year": trans["credit_card"]["exp"]["year"],
-                        "cvv": trans["credit_card"]["cvv"],
-                        "amount": trans["amount"],
-                        "label": trans["purchase_desc"],
-                        "merchant_id": trans["merchant"]["id"],
-                        "bank_transaction_id": resp_data["transactionId"]
-                    })
-
-                    cancel_transaction_timer(t.id)
-                    return prepare_response(jsonify({"result": SUCCESS, "transaction_number": t.id}),200)
+                    transaction.encrypt_data()
+                    TransactionRepository.create(transaction=transaction)
+                    transaction.set_bank_trans_id(resp_data["transactionId"])
+                    cancel_transaction_timer(transaction.id)
+                    return prepare_response(jsonify({"result": SUCCESS, "transaction_number": transaction.id}), 200)
 
             else:
-                logger.error("Transaction invalid")
+                logger.info("Transaction invalid")
                 return prepare_response(jsonify({"result": INVALID}), 400)
         except ValueError as e:
             logger.error("ValueError error occured. message={}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID}), 400)
 
-        except Exception as e :
+        except Exception as e:
             logger.error("Exception error occured. message={}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID}), 400)
 
-
+processed_transaction = "processed_transaction"
 @tn.route("/process")
 class TransactionResourceConfirmation(Resource):
     """
@@ -155,12 +145,12 @@ class TransactionResourceConfirmation(Resource):
     @tn.response(200, SUCCESS)
     @tn.response(400, INVALID)
     @tn.response(403, UNAUTHORIZED_ACCESS)
-    @parse_with(TransactionProcessSchema(strict=True))
+    @parse_with(TransactionProcessSchema(strict=True),arg_name=processed_transaction)
     def post(self, **kwargs):
         try:
-            api_key = kwargs["entity"][MERCHANT_API_KEY]
-            transaction_number = kwargs["entity"]["transaction_number"]
-            action = kwargs["entity"]["action"]
+            api_key = kwargs[MERCHANT_API_KEY]
+            transaction_number = kwargs[processed_transaction]["transaction_number"]
+            action = kwargs[processed_transaction]["action"]
 
             transaction = Transaction.query.get(transaction_number)
             merchant = Merchant.query.filter_by(api_key=api_key).first()
@@ -171,10 +161,10 @@ class TransactionResourceConfirmation(Resource):
                 trans_data = {"bank_transaction_id": transaction_number, "action": action}
 
                 if bank_id == BANKX_ID:
-                    status_code, resp_data = call_fake_bank(action=PROCESS_TRANS_ACTION, **trans_data)
+                    status_code, resp_data = call_fake_bank(act=PROCESS_TRANS_ACTION, **trans_data)
 
                 else:
-                    status_code, resp_data = call_real_bank(bank_id, action=PROCESS_TRANS_ACTION, **trans_data)
+                    status_code, resp_data = call_real_bank(bank_id, act=PROCESS_TRANS_ACTION, **trans_data)
 
                 if status_code == 200 or status_code == 201:
 
@@ -204,21 +194,19 @@ def cancel_transaction_timer(trans_num):
     if still PENDING
     """
 
-    def func(id):
-        if id:
-            trans = Transaction.query.get(id)
+    def func(**kwargs):
 
-            if trans is not None and trans.status == PENDING:
-                trans.refuse()
-                TransactionRepository.update(trans)
-                logger.error("Transaction {} cancelled".format(trans_num))
+        if kwargs["trans_num"]:
+            logger.info("Canceling transaction {}".format(trans_num))
+
+            tasks.cancel_transaction(kwargs["trans_num"])
 
     t = Timer(RESERVATION_TIME, func, kwargs={"trans_num": trans_num})
     t.start()
-    logger.error("Timer started for transaction {}".format(trans_num))
+    logger.info("Timer started for transaction {}".format(trans_num))
 
 
-def prepare_response(data,code):
+def prepare_response(data, code):
     response = data
     response.status_code = code
-    return  response
+    return response

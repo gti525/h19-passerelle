@@ -16,4 +16,5 @@ attrs==17.4.0
 requests
 wtforms
 flask_wtf
-psycopg2-binary
+psycopg2-binary 
+flask-cors

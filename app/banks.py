@@ -1,10 +1,11 @@
+import logging
+
 import requests
 
 from app.consts import BANK1_BASE_URL
 from app.consts import BANK2_BASE_URL
 from app.utils import genrators
 from app.utils.aes import encrypt
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -16,17 +17,17 @@ PRE_AUTHORIZE_TRANS_ACTION = "pre_auth"
 PROCESS_TRANS_ACTION = "process"
 
 
-def call_real_bank(bank_id, action=None, **kwargs):
+def call_real_bank(bank_id, act=None, **kwargs):
     response = None
 
-    if action == PRE_AUTHORIZE_TRANS_ACTION:
+    if act == PRE_AUTHORIZE_TRANS_ACTION:
 
         if bank_id == BANK2_ID:
             response = Bank2.pre_authorize_transaction(**kwargs)
         elif bank_id == BANK1_ID:
             response = Bank1.pre_authorize_transaction(**kwargs)
 
-    elif action == PROCESS_TRANS_ACTION:
+    elif act == PROCESS_TRANS_ACTION:
         if bank_id == BANK1_ID:
             response = Bank1.process_transaction(**kwargs)
 
@@ -45,14 +46,15 @@ def call_real_bank(bank_id, action=None, **kwargs):
         return response.status_code, {}
 
 
-def call_fake_bank(action=None, **kwargs):
+def call_fake_bank(act=None, **kwargs):
     code = 200
     resp_data = {}
 
     try:
-        if action == PRE_AUTHORIZE_TRANS_ACTION:
+        if act == PRE_AUTHORIZE_TRANS_ACTION:
             resp_data["transactionId"] = genrators.random_with_N_digits(12)
-
+        elif act == PROCESS_TRANS_ACTION:
+            pass
         return code, resp_data
     except Exception as e :
         logger.error("Exception message={}".format(str(e)))
@@ -62,17 +64,17 @@ def call_fake_bank(action=None, **kwargs):
 
 class Bank:
     @staticmethod
-    def pre_authorize_transaction(self, card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
+    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
         pass
 
     @staticmethod
-    def process_transaction(self, bank_transaction_id, action):
+    def process_transaction(bank_transaction_id, action):
         pass
 
 
 class Bank2(Bank):
-
-    def pre_authorize_transaction(self, card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
+    @staticmethod
+    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
         url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
         headers = {"X-API-KEY": "15489123311"}
         data = {
@@ -89,7 +91,8 @@ class Bank2(Bank):
         r = requests.post(url, headers=headers, data=data)
         return r
 
-    def process_transaction(self, bank_transaction_id, action):
+    @staticmethod
+    def process_transaction(bank_transaction_id, action):
         url = BANK2_BASE_URL + "/api/v1/paymentGateway/process"
         headers = {"X-API-KEY": "15489123311"}
         data = {

@@ -1,8 +1,9 @@
 import os
 from logging.config import dictConfig
+from flask_cors import CORS
 
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, Blueprint
 from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
@@ -28,14 +29,18 @@ dictConfig({
 load_dotenv()
 
 db = SQLAlchemy()
-api_V1 = Api(version='1.0', title='PaymentGateway - API',
-             description='Passerelle de paiement - GTI525:H19',
+
+api_bp = Blueprint('api', __name__,url_prefix="/api")
+api_V1 = Api(app=api_bp, prefix="/v1", version='1.0', title='PaymentGateway - API',
+             description='Passerelle de paiement - GTI525:H19',doc='/doc/'
              )
 
 
 def create_app(config=None):
     app = Flask(__name__)
     # app.wsgi_app = ProxyFix(app.wsgi_app)
+
+    cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     if config is None:
         config = os.getenv('APP_SETTINGS')  # config_name = "development"
@@ -47,11 +52,10 @@ def create_app(config=None):
     db.init_app(app)
 
     from app.models.users import Admin, Merchant, User
-    from app.models.trasactions import Transaction
+    from app.models.transactions import Transaction
 
     from app.routes.main import main_bp
     from app.routes.login import  login_bp
-    from app.routes.dashboard import dashboard_bp
     from app.routes.settings import settings_bp
     from app.routes.userManagement import userManagement_bp
     from app.routes.userModify import userModify_bp
@@ -60,13 +64,11 @@ def create_app(config=None):
     from app.routes.errors import page_not_found, page_error
 
     from app.routes.api import tn
-
     api_V1.add_namespace(tn)
-    api_V1.init_app(app)
 
+    app.register_blueprint(api_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(login_bp)
-    app.register_blueprint(dashboard_bp)
     app.register_blueprint(settings_bp)
     app.register_blueprint(userManagement_bp)
     app.register_blueprint(userModify_bp)

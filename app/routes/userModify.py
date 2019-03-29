@@ -28,7 +28,7 @@ def userModify():
                 flash("Modification réussi!")
             return render_template('userModify.html', form=form, title='Modifier un usager')
         else:
-            return redirect('dashboard')
+            return redirect('transaction')
     else:
         return redirect('login')
 

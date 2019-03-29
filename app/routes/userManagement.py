@@ -12,7 +12,7 @@ def userManagement():
         if current_user.type == 'admin':
             merchants = Merchant.query.filter_by(status='active')
         else:
-            redirect("dashboard.html")
+            redirect("transaction.html")
 
         return render_template("userManagement.html", merchants=merchants)
     else:
@@ -30,7 +30,7 @@ def userDelete():
             db.session.commit()
             flash("Marchand supprimer")
         else:
-            redirect("dashboard")
+            redirect("transaction")
 
         return redirect('userManagement')
     else:
