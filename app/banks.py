@@ -2,6 +2,7 @@ import logging
 
 import requests
 
+from app.consts import BANK1_BASE_URL
 from app.consts import BANK2_BASE_URL
 from app.utils import genrators
 from app.utils.aes import encrypt
@@ -60,6 +61,7 @@ def call_fake_bank(act=None, **kwargs):
         return 400, {}
 
 
+
 class Bank:
     @staticmethod
     def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
@@ -102,8 +104,41 @@ class Bank2(Bank):
 
 
 class Bank1(Bank):
-    # TODO wating for bank1 ...
-    pass
+    @staticmethod
+    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
+        url = BANK1_BASE_URL + "/api/paymentgateway/preauth"
+        descBank1 = ''
+        if amount >= 0:
+            descBank1 = 'Achat chez ' + merchant.name
+        else:
+            descBank1 = 'Remboursement en provenance de ' + merchant.name
+        cHolderNames = card_holder_name.split()
+        headers = {"apikey": "FyufTW2r!"}
+        data = {
+            "merchantAccountNo": merchant.account_number,
+            "firstname": cHolderNames[0],
+            "lastname": cHolderNames[1],
+            "ccNumber": card_number,
+            "cvv": cvv,
+            "month": month_exp,
+            "year": year_exp,
+            "amount": amount,
+            "transactionDesc": descBank1
+        }
+        r = requests.post(url, headers=headers, data=data)
+        return r
+
+    @staticmethod
+    def process_transaction(bank_transaction_id, action):
+        url = BANK1_BASE_URL + "/api/paymentgateway/process"
+
+        headers = {"apikey": "FyufTW2r!"}
+        data = {
+            "transactionID": bank_transaction_id,
+            "action": action,
+        }
+        r = requests.post(url, headers=headers, data=data)
+        return r
 
 
 def get_bank_id(number):
