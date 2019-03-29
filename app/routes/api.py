@@ -6,7 +6,7 @@ from flask_restplus import Resource, fields, reqparse
 from app import api_V1
 from app.banks import *
 from app.consts import *
-from app.models.transactions import Transaction, PENDING, TransactionRepository
+from app.models.transactions import Transaction, PENDING,AUTHORIZED, TransactionRepository
 from app.models.users import Merchant
 from app.schemas import TransactionCreateSchema, TransactionProcessSchema
 from app.utils.aes import decrypt
@@ -155,7 +155,7 @@ class TransactionResourceConfirmation(Resource):
             transaction = Transaction.query.get(transaction_number)
             merchant = Merchant.query.filter_by(api_key=api_key).first()
 
-            if transaction is not None and merchant is not None:
+            if transaction is not None and merchant is not None and transaction.status == PENDING:
                 card_number = decrypt(transaction.credit_card_number)
                 bank_id = get_bank_id(card_number)
                 trans_data = {"bank_transaction_id": transaction_number, "action": action}
