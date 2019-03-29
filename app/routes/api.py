@@ -155,7 +155,7 @@ class TransactionResourceConfirmation(Resource):
             transaction = Transaction.query.get(transaction_number)
             merchant = Merchant.query.filter_by(api_key=api_key).first()
 
-            if transaction.status == PENDING and (transaction is not None and merchant is not None):
+            if transaction is not None and merchant is not None and transaction.status == PENDING:
                 card_number = decrypt(transaction.credit_card_number)
                 bank_id = get_bank_id(card_number)
                 trans_data = {"bank_transaction_id": transaction_number, "action": action}
