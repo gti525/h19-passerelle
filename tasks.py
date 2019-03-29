@@ -1,4 +1,7 @@
 #!/bin/sh
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 #
@@ -29,8 +32,7 @@ def cancel_transaction(transaction_id=None):
     try:
         cur.execute(
             """UPDATE transaction set status = (CASE WHEN current_date > created + (15 ||' minutes')::interval THEN 
-            'Canceled' END) 
-            WHERE id= {}""".format(transaction_id))
+            'Canceled' ELSE 'Pending' END) WHERE id={} ;""".format(transaction_id))
         print("Transaction pending for more than 15 minutes have been delete")
     except (Exception, psycopg2.DatabaseError) as error:
         print("Cant update")

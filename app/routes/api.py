@@ -12,6 +12,7 @@ from app.schemas import TransactionCreateSchema, TransactionProcessSchema
 from app.utils.aes import decrypt
 from app.utils.decorators import parse_with, HasApiKey
 import tasks
+import logging
 logger = logging.getLogger(__name__)
 
 RESERVATION_TIME = 960  # 16 minutes in seconds. just in case...
