@@ -129,11 +129,11 @@ class TransactionResourceCreate(Resource):
                 logger.info("Transaction invalid")
                 return prepare_response(jsonify({"result": INVALID}), 400)
         except ValueError as e:
-            logger.error("ValueError error occured. message={}".format(str(e)))
+            logger.error("ValueError error occured. {}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID}), 400)
 
         except Exception as e:
-            logger.error("Exception error occured. message={}".format(str(e)))
+            logger.error("Exception error occured. {}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID}), 400)
 
 processed_transaction = "processed_transaction"
