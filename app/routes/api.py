@@ -136,6 +136,9 @@ class TransactionResourceCreate(Resource):
             logger.error("Exception error occured. {}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID}), 400)
 
+        return prepare_response(jsonify({"result": INVALID}), 400)
+
+
 processed_transaction = "processed_transaction"
 @tn.route("/process")
 class TransactionResourceConfirmation(Resource):
@@ -189,6 +192,7 @@ class TransactionResourceConfirmation(Resource):
         except Exception as e:
             logger.error("Exception error occured. message={}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID}), 400)
+
 
 
 def cancel_transaction_timer(trans_num):
