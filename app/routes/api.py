@@ -106,7 +106,7 @@ class TransactionResourceCreate(Resource):
                     "merchant": merchant,
                     "card_number": transaction.credit_card_number,
                     "cvv": transaction.cvv,
-                    "month_exp": transaction.exp_month,
+                    "month_exp": add_leading_zero(transaction.exp_month),
                     "year_exp": transaction.exp_year
                 }
 
@@ -210,3 +210,12 @@ def prepare_response(data, code):
     response = data
     response.status_code = code
     return response
+
+
+def add_leading_zero(str):
+    if len(str) == 2:
+        return str
+    elif len(str) == 1:
+        return "0{}".format(str)
+    else:
+        return str
