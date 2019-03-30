@@ -36,7 +36,7 @@ def call_real_bank(bank_id, act=None, **kwargs):
 
     try:
         response.raise_for_status()
-        return response.status_code, response.json()[0]
+        return response.status_code, response.json()
 
     except requests.HTTPError as e:
         logger.error("HTTPError status-code={}  message={}".format(response.status_code,str(e)))
