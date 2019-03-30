@@ -89,7 +89,7 @@ class Bank2(Bank):
             }
         }
         r = requests.post(url, headers=headers, json=data)
-        logData(r)
+        log_data(r, data)
 
         return r
 
@@ -127,7 +127,7 @@ class Bank1(Bank):
             "transactionDesc": descBank1
         }
         r = requests.post(url, headers=headers, json=data)
-        logData(r)
+        log_data(r,data)
         return r
 
     @staticmethod
@@ -153,11 +153,13 @@ def get_bank_id(number):
         return BANKX_ID
 
 
-def logData(response):
-    parsed_headers = jjson.loads(jjson.dumps(response.headers))
+def log_data(response, data):
+    parsed_headers = jjson.loads(jjson.dumps(dict(response.headers)))
     parsed_text = jjson.loads(jjson.dumps(response.text))
-    logger.info("headers: {}".format(jjson.dumps(parsed_headers, indent=4, sort_keys=True)))
-    logger.info("headers: {}".format(jjson.dumps(parsed_text, indent=4, sort_keys=True)))
+    parsed_data = jjson.loads(jjson.dumps(data))
+    logger.info("Headers: {}".format(jjson.dumps(parsed_headers, indent=4, sort_keys=True)))
+    logger.info("Text: {}".format(jjson.dumps(parsed_text, indent=4, sort_keys=True)))
+    logger.info("Data: {}".format(jjson.dumps(parsed_data, indent=4, sort_keys=True)))
 
 
 

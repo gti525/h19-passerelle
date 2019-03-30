@@ -161,7 +161,7 @@ class TransactionResourceConfirmation(Resource):
             if transaction is not None and merchant is not None and transaction.status == PENDING:
                 card_number = decrypt(transaction.credit_card_number)
                 bank_id = get_bank_id(card_number)
-                trans_data = {"bank_transaction_id": transaction_number, "action": action}
+                trans_data = {"bank_transaction_id": transaction.bank_transaction_id, "action": action}
 
                 if bank_id == BANKX_ID:
                     status_code, resp_data = call_fake_bank(act=PROCESS_TRANS_ACTION, **trans_data)
