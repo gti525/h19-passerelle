@@ -40,14 +40,10 @@ def call_real_bank(bank_id, act=None, **kwargs):
         parsed_res = jjson.loads(jjson.dumps(results))
         logger.info("Response data: {}".format(jjson.dumps(parsed_res, indent=4, sort_keys=True)))
 
-        data = {"result": results["result"]}
-
-        if "transactionId" in results:
-            data["transactionId"] = results["transactionId"]
-        elif "transactionID" in results:
-            data["transactionId"] = results["transactionID"]
-
-        return response.status_code, data
+        if "ACCEPTED" in results.values() or "COMMITED" in results.values():
+            return response.status_code, results
+        else:
+            return 400,{}
 
     except requests.HTTPError as e:
         logger.error("HTTPError status-code={}  message={}".format(response.status_code, str(e)))
@@ -168,7 +164,7 @@ def get_bank_id(number):
 
 
 def log_data(response, data):
- #   parsed_headers = jjson.loads(jjson.dumps(dict(response.headers)))
+    #   parsed_headers = jjson.loads(jjson.dumps(dict(response.headers)))
     parsed_data = jjson.loads(jjson.dumps(data))
-#    logger.info("Headers: {}".format(jjson.dumps(parsed_headers, indent=4, sort_keys=True)))
+    #    logger.info("Headers: {}".format(jjson.dumps(parsed_headers, indent=4, sort_keys=True)))
     logger.info("Data: {}".format(jjson.dumps(parsed_data, indent=4, sort_keys=True)))
