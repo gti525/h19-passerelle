@@ -38,7 +38,7 @@ def call_real_bank(bank_id, act=None, **kwargs):
         response.raise_for_status()
         results = response.json()
         parsed_res = jjson.loads(jjson.dumps(results))
-        logger.debug("Response data: {}".format(jjson.dumps(parsed_res, indent=4, sort_keys=True)))
+        logger.info("Response data: {}".format(jjson.dumps(parsed_res, indent=4, sort_keys=True)))
 
         data = {"result": results["result"]}
 
@@ -172,5 +172,5 @@ def log_data(response, data):
     parsed_text = jjson.loads(jjson.dumps(response.text))
     parsed_data = jjson.loads(jjson.dumps(data))
     logger.info("Headers: {}".format(jjson.dumps(parsed_headers, indent=4, sort_keys=True)))
-    logger.info("Text: {}".format(jjson.dumps(parsed_text, indent=4, sort_keys=True)))
+    logger.info("Response Text: {}".format(jjson.dumps(parsed_text, indent=4, sort_keys=True)))
     logger.info("Data: {}".format(jjson.dumps(parsed_data, indent=4, sort_keys=True)))
