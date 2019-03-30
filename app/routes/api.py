@@ -13,6 +13,9 @@ from app.utils.aes import decrypt
 from app.utils.decorators import parse_with, HasApiKey
 import tasks
 import logging
+
+from app.utils.genrators import add_leading_zero
+
 logger = logging.getLogger(__name__)
 
 RESERVATION_TIME = 960  # 16 minutes in seconds. just in case...
@@ -211,11 +214,3 @@ def prepare_response(data, code):
     response.status_code = code
     return response
 
-
-def add_leading_zero(str):
-    if len(str) == 2:
-        return str
-    elif len(str) == 1:
-        return "0{}".format(str)
-    else:
-        return str
