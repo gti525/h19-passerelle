@@ -84,7 +84,7 @@ class Bank2(Bank):
             "account": {
                 "cardholderName": card_holder_name,
                 "number": encrypt(card_number),
-                "expiryDate": "{}/{}".format(month_exp, year_exp),
+                "exp": "{}/{}".format(month_exp, year_exp),
                 "cvv": encrypt(cvv)
             }
         }
@@ -120,7 +120,7 @@ class Bank1(Bank):
             "lastName": cHolderNames[1],
             "ccNumber": card_number,
             "cvv": cvv,
-            "exp": "{}/{}".format(month_exp, year_exp),
+            "expiryDate": "{}/{}".format(month_exp, year_exp),
             "amount": amount,
             "transactionDesc": descBank1
         }
