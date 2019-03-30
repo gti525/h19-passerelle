@@ -57,7 +57,7 @@ cancellation_model = tn.model('Transaction cancellation', {
 # Model for transaction confirmation
 ProcessTransaction = tn.model('Transaction process', {
     'transaction_number': fields.String(required=True, example="1234567890"),
-    "action": fields.String(description='Action', enum=[CONFIRM_TRANS, CANCEL_TRANS]),
+    "action": fields.String(description='Action', enum=[COMMIT_TRANS, CANCEL_TRANS]),
     MERCHANT_API_KEY: fields.String(required=True, example="98765431235465"),
 })
 
@@ -173,7 +173,7 @@ class TransactionResourceConfirmation(Resource):
 
                     if action == CANCEL_TRANS:
                         transaction.cancel()
-                    elif action == CONFIRM_TRANS:
+                    elif action == COMMIT_TRANS:
                         transaction.authorize()
 
                     TransactionRepository.update(transaction)

@@ -104,6 +104,6 @@ class TransactionProcessSchema(Schema):
 
     @validates("action")
     def validate_amount(self, value):
-        if value not in [CONFIRM_TRANS, CANCEL_TRANS]:
+        if value not in [COMMIT_TRANS, CANCEL_TRANS]:
             logger.error("action is invalid")
             raise ValidationError("action is invalid")

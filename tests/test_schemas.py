@@ -145,7 +145,7 @@ class TestTransactionProcessSchema(object):
 
     @pytest.mark.parametrize("api_key,action,trans_id", [
         ("2135235125", CANCEL_TRANS, 23152352523),
-        ("2135235125", CONFIRM_TRANS, 23152352523)
+        ("2135235125", COMMIT_TRANS, 23152352523)
     ], ids=[])
     def test_valid_process(self, api_key, action, trans_id):
         data = {
