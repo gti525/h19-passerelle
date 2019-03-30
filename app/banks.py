@@ -1,5 +1,5 @@
 import logging
-
+import json as jjson
 import requests
 
 from app.consts import BANK1_BASE_URL
@@ -88,6 +88,7 @@ class Bank2(Bank):
                 "cvv": encrypt(cvv)
             }
         }
+        logData(data)
         r = requests.post(url, headers=headers, json=data)
         return r
 
@@ -124,6 +125,7 @@ class Bank1(Bank):
             "amount": str(amount),
             "transactionDesc": descBank1
         }
+        logData(data)
         r = requests.post(url, headers=headers, json=data)
         return r
 
@@ -148,3 +150,11 @@ def get_bank_id(number):
         return BANK2_ID
     else:
         return BANKX_ID
+
+
+def logData(data):
+    parsed = jjson.loads(data)
+    logger.info((jjson.dumps(parsed, indent=4, sort_keys=True)))
+
+
+
