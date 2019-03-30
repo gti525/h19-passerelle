@@ -88,8 +88,9 @@ class Bank2(Bank):
                 "cvv": encrypt(cvv)
             }
         }
-        logData(data)
         r = requests.post(url, headers=headers, json=data)
+        logData(r)
+
         return r
 
     @staticmethod
@@ -125,8 +126,8 @@ class Bank1(Bank):
             "amount": str(amount),
             "transactionDesc": descBank1
         }
-        logData(data)
         r = requests.post(url, headers=headers, json=data)
+        logData(r)
         return r
 
     @staticmethod
@@ -152,9 +153,11 @@ def get_bank_id(number):
         return BANKX_ID
 
 
-def logData(data):
-    parsed = jjson.loads(jjson.dumps(data))
-    logger.info((jjson.dumps(parsed, indent=4, sort_keys=True)))
+def logData(response):
+    parsed_headers = jjson.loads(jjson.dumps(response.headers))
+    parsed_text = jjson.loads(jjson.dumps(response.text))
+    logger.info("headers: {}".format(jjson.dumps(parsed_headers, indent=4, sort_keys=True)))
+    logger.info("headers: {}".format(jjson.dumps(parsed_text, indent=4, sort_keys=True)))
 
 
 
