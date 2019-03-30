@@ -115,13 +115,13 @@ class Bank1(Bank):
         cHolderNames = card_holder_name.split()
         headers = {"apikey": "FyufTW2r!"}
         data = {
-            "merchantAccountNo": merchant.account_number,
+            "merchantAccountNo": str(merchant.account_number),
             "firstName": cHolderNames[0],
             "lastName": cHolderNames[1],
-            "ccNumber": card_number,
+            "ccNumber": str(card_number),
             "cvv": cvv,
             "expiryDate": "{}/{}".format(month_exp, year_exp),
-            "amount": amount,
+            "amount": str(amount),
             "transactionDesc": descBank1
         }
         r = requests.post(url, headers=headers, json=data)
