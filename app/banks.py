@@ -42,7 +42,7 @@ def call_real_bank(bank_id, act=None, **kwargs):
         logger.error("HTTPError status-code={}  message={}".format(response.status_code,str(e)))
         return response.status_code, {}
     except Exception as e:
-        logger.error("Exception".format(str(e)))
+        logger.error("Exception: {}".format(str(e)))
         return response.status_code, {}
 
 
