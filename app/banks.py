@@ -84,7 +84,7 @@ class Bank2(Bank):
             "account": {
                 "cardholderName": card_holder_name,
                 "number": encrypt(card_number),
-                "exp": "{}/{}".format(month_exp, year_exp),
+                "expiryDate": "{}/{}".format(month_exp, year_exp),
                 "cvv": encrypt(cvv)
             }
         }
@@ -116,12 +116,11 @@ class Bank1(Bank):
         headers = {"apikey": "FyufTW2r!"}
         data = {
             "merchantAccountNo": merchant.account_number,
-            "firstname": cHolderNames[0],
-            "lastname": cHolderNames[1],
+            "firstName": cHolderNames[0],
+            "lastName": cHolderNames[1],
             "ccNumber": card_number,
             "cvv": cvv,
-            "month": month_exp,
-            "year": year_exp,
+            "exp": "{}/{}".format(month_exp, year_exp),
             "amount": amount,
             "transactionDesc": descBank1
         }
