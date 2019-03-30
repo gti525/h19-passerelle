@@ -102,6 +102,8 @@ class Bank2(Bank):
             "action": action
         }
         r = requests.post(url, headers=headers, json=data)
+        log_data(r, data)
+
         return r
 
 
@@ -140,6 +142,8 @@ class Bank1(Bank):
             "action": action,
         }
         r = requests.post(url, headers=headers, json=data)
+        log_data(r, data)
+
         return r
 
 
