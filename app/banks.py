@@ -120,7 +120,7 @@ class Bank1(Bank):
             "firstName": cHolderNames[0],
             "lastName": cHolderNames[1],
             "ccNumber": str(card_number),
-            "cvv": cvv,
+            "cvv": int(cvv),
             "expiryDate": "{}/{}".format(month_exp, year_exp),
             "amount": str(amount),
             "transactionDesc": descBank1
