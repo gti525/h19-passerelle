@@ -153,7 +153,7 @@ def get_bank_id(number):
 
 
 def logData(data):
-    parsed = jjson.loads(data)
+    parsed = jjson.loads(jjson.dumps(data))
     logger.info((jjson.dumps(parsed, indent=4, sort_keys=True)))
 
 
