@@ -36,10 +36,21 @@ def call_real_bank(bank_id, act=None, **kwargs):
 
     try:
         response.raise_for_status()
-        return response.status_code, response.json()
+        results = response.json()
+        parsed_res = jjson.loads(jjson.dumps(results))
+        logger.debug("Response data: {}".format(jjson.dumps(parsed_res, indent=4, sort_keys=True)))
+
+        data = {"result": results["result"]}
+
+        if "transactionId" in results:
+            data["transactionId"] = results["transactionId"]
+        elif "transactionID" in results:
+            data["transactionId"] = results["transactionID"]
+
+        return response.status_code, data
 
     except requests.HTTPError as e:
-        logger.error("HTTPError status-code={}  message={}".format(response.status_code,str(e)))
+        logger.error("HTTPError status-code={}  message={}".format(response.status_code, str(e)))
         return response.status_code, {}
     except Exception as e:
         logger.error("Exception: {}".format(str(e)))
@@ -56,10 +67,9 @@ def call_fake_bank(act=None, **kwargs):
         elif act == PROCESS_TRANS_ACTION:
             pass
         return code, resp_data
-    except Exception as e :
+    except Exception as e:
         logger.error("Exception message={}".format(str(e)))
         return 400, {}
-
 
 
 class Bank:
@@ -129,7 +139,7 @@ class Bank1(Bank):
             "transactionDesc": descBank1
         }
         r = requests.post(url, headers=headers, json=data)
-        log_data(r,data)
+        log_data(r, data)
         return r
 
     @staticmethod
@@ -164,6 +174,3 @@ def log_data(response, data):
     logger.info("Headers: {}".format(jjson.dumps(parsed_headers, indent=4, sort_keys=True)))
     logger.info("Text: {}".format(jjson.dumps(parsed_text, indent=4, sort_keys=True)))
     logger.info("Data: {}".format(jjson.dumps(parsed_data, indent=4, sort_keys=True)))
-
-
-

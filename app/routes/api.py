@@ -118,10 +118,10 @@ class TransactionResourceCreate(Resource):
                 else:
                     status_code, resp_data = call_real_bank(bank_id, act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
-                if status_code == 200 and "transactionId" in resp_data is not None:
+                if status_code == 200:
                     transaction.encrypt_data()
-                    TransactionRepository.create(transaction=transaction)
                     transaction.set_bank_trans_id(resp_data["transactionId"])
+                    TransactionRepository.create(transaction=transaction)
                     cancel_transaction_timer(transaction.id)
                     return prepare_response(jsonify({"result": SUCCESS, "transaction_number": transaction.id}), 200)
 
