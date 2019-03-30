@@ -168,9 +168,7 @@ def get_bank_id(number):
 
 
 def log_data(response, data):
-    parsed_headers = jjson.loads(jjson.dumps(dict(response.headers)))
-    parsed_text = jjson.loads(jjson.dumps(response.text))
+ #   parsed_headers = jjson.loads(jjson.dumps(dict(response.headers)))
     parsed_data = jjson.loads(jjson.dumps(data))
-    logger.info("Headers: {}".format(jjson.dumps(parsed_headers, indent=4, sort_keys=True)))
-    logger.info("Response Text: {}".format(jjson.dumps(parsed_text, indent=4, sort_keys=True)))
+#    logger.info("Headers: {}".format(jjson.dumps(parsed_headers, indent=4, sort_keys=True)))
     logger.info("Data: {}".format(jjson.dumps(parsed_data, indent=4, sort_keys=True)))
