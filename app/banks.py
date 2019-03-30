@@ -2,8 +2,7 @@ import logging
 import json as jjson
 import requests
 
-from app.consts import BANK1_BASE_URL
-from app.consts import BANK2_BASE_URL
+from app.consts import *
 from app.utils import genrators
 from app.utils.aes import encrypt
 
@@ -40,10 +39,8 @@ def call_real_bank(bank_id, act=None, **kwargs):
         parsed_res = jjson.loads(jjson.dumps(results))
         logger.info("Response data: {}".format(jjson.dumps(parsed_res, indent=4, sort_keys=True)))
 
-        if "ACCEPTED" in results.values() or "COMMITED" in results.values():
+        if COMMITTED in results.values() or ACCEPTED in results.values():
             return response.status_code, results
-        else:
-            return 400,{}
 
     except requests.HTTPError as e:
         logger.error("HTTPError status-code={}  message={}".format(response.status_code, str(e)))
@@ -51,6 +48,8 @@ def call_real_bank(bank_id, act=None, **kwargs):
     except Exception as e:
         logger.error("Exception: {}".format(str(e)))
         return response.status_code, {}
+
+    return 400, {}
 
 
 def call_fake_bank(act=None, **kwargs):
