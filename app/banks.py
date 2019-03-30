@@ -116,12 +116,11 @@ class Bank1(Bank):
         headers = {"apikey": "FyufTW2r!"}
         data = {
             "merchantAccountNo": merchant.account_number,
-            "firstname": cHolderNames[0],
-            "lastname": cHolderNames[1],
+            "firstName": cHolderNames[0],
+            "lastName": cHolderNames[1],
             "ccNumber": card_number,
             "cvv": cvv,
-            "month": month_exp,
-            "year": year_exp,
+            "expiryDate": "{}/{}".format(month_exp, year_exp),
             "amount": amount,
             "transactionDesc": descBank1
         }
@@ -134,7 +133,7 @@ class Bank1(Bank):
 
         headers = {"apikey": "FyufTW2r!"}
         data = {
-            "transactionID": bank_transaction_id,
+            "transactionId": bank_transaction_id,
             "action": action,
         }
         r = requests.post(url, headers=headers, data=data)
