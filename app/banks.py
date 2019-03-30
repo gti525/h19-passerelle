@@ -88,7 +88,7 @@ class Bank2(Bank):
                 "cvv": encrypt(cvv)
             }
         }
-        r = requests.post(url, headers=headers, data=data)
+        r = requests.post(url, headers=headers, json=data)
         return r
 
     @staticmethod
@@ -99,7 +99,7 @@ class Bank2(Bank):
             "transactionID": bank_transaction_id,
             "action": action
         }
-        r = requests.post(url, headers=headers, data=data)
+        r = requests.post(url, headers=headers, json=data)
         return r
 
 
@@ -124,7 +124,7 @@ class Bank1(Bank):
             "amount": amount,
             "transactionDesc": descBank1
         }
-        r = requests.post(url, headers=headers, data=data)
+        r = requests.post(url, headers=headers, json=data)
         return r
 
     @staticmethod
@@ -136,7 +136,7 @@ class Bank1(Bank):
             "transactionId": bank_transaction_id,
             "action": action,
         }
-        r = requests.post(url, headers=headers, data=data)
+        r = requests.post(url, headers=headers, json=data)
         return r
 
 
