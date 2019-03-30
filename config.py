@@ -23,6 +23,8 @@ class StagingConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
+    CSRF_ENABLED = True
+    SECRET_KEY = os.getenv('SECRET_KEY')
 
 
 class TestingConfig(Config):
