@@ -103,7 +103,7 @@ class Bank2(Bank):
         url = BANK2_BASE_URL + "/api/v1/paymentGateway/process"
         headers = {"X-API-KEY": "15489123311"}
         data = {
-            "transactionID": bank_transaction_id,
+            "transactionId": bank_transaction_id,
             "action": action
         }
         r = requests.post(url, headers=headers, json=data)
