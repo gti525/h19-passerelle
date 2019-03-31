@@ -12,15 +12,15 @@ BANK1_ID = 1111
 BANK2_ID = 5105
 BANKX_ID = 0000
 
-PRE_AUTHORIZE_TRANS_ACTION = "pre_auth"
-PROCESS_TRANS_ACTION = "process"
+PRE_AUTHORIZE_TRANS_ACTION = "PRE_AUTH_ACTION"
+PROCESS_TRANS_ACTION = "PROCESS_ACTION"
 
 
 def call_real_bank(bank_id, act=None, **kwargs):
     response = None
+    logger.info("ACTION = {} to BANK = {}".format(act,bank_id))
 
     if act == PRE_AUTHORIZE_TRANS_ACTION:
-
         if bank_id == BANK2_ID:
             response = Bank2.pre_authorize_transaction(**kwargs)
         elif bank_id == BANK1_ID:
