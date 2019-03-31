@@ -104,7 +104,7 @@ class TransactionResourceCreate(Resource):
                 transaction.set_merchant(merchant)
                 bank_id = get_bank_id(transaction.credit_card_number)
                 trans_data = {
-                    "card_holder_name": "{} {} ".format(transaction.first_name, transaction.last_name),
+                    "card_holder_name": "{} {}".format(transaction.first_name, transaction.last_name),
                     "amount": transaction.amount,
                     "merchant": merchant,
                     "card_number": transaction.credit_card_number,
