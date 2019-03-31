@@ -85,7 +85,7 @@ class Bank2(Bank):
         data = {
             "amount": amount,
             "merchantDesc": merchant.name,
-            "merchantAccountNumber": merchant.account_number,
+            "merchantAccountNumber": int(merchant.account_number),
             "account": {
                 "cardholderName": card_holder_name,
                 "number": encrypt(card_number),
