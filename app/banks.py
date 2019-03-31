@@ -34,6 +34,7 @@ def call_real_bank(bank_id, act=None, **kwargs):
             response = Bank2.process_transaction(**kwargs)
 
     try:
+        logger.info("Response status: {}".format(response.status_code))
         response.raise_for_status()
         results = response.json()
         parsed_res = jjson.loads(jjson.dumps(results))
