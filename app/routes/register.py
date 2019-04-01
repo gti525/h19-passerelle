@@ -17,6 +17,9 @@ def register():
     if current_user.is_authenticated and current_user.type == 'admin':
 
         form = RegistrationForm()
+        if form.userType.data == 'admin':
+            del form.account_number
+            del form.username
         if form.validate_on_submit():
             if form.userType.data == 'admin':
                 user = Admin(email=form.email.data, password=encrypt(form.password.data), type=form.userType.data)

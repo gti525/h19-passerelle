@@ -114,9 +114,9 @@
                         <tr>
                             <th>Nom</th>
                             <th>Prénom</th>
-                            <th>Carte de crédit</th>
                             <th>Montant</th>
                             <th>Description</th>
+                            <th>Date</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -124,9 +124,9 @@
                         <tr>
                             <td>{{transaction.last_name}}</td>
                             <td>{{transaction.first_name}}</td>
-                            <td>{{transaction.credit_card_number}}</td>
                             <td>${{ "{:,.2f}".format(transaction.amount)}}</td>
                             <td>{{transaction.label}}</td>
+                            <td>{{ transaction.created.strftime('%Y-%m-%d') }}</td>
                         </tr>
                         {% endfor %}
                         </tbody>
