@@ -179,6 +179,8 @@ class TransactionResourceConfirmation(Resource):
 
                 if status_code == 200 or status_code == 201:
 
+                    resp_result = ""
+
                     if action == CANCEL and resp_data["result"] == CANCELLED:
                         transaction.cancel()
                         logger.info("Transaction {} was canceled".format(transaction.id))
