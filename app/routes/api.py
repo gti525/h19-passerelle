@@ -1,70 +1,58 @@
+import logging
 from threading import Timer
 
 from flask import jsonify
 from flask_restplus import Resource, fields, reqparse
 
+import tasks
 from app import api_V1
 from app.banks import *
 from app.consts import *
-from app.models.transactions import Transaction, PENDING,AUTHORIZED, TransactionRepository
+from app.models.transactions import Transaction, PENDING, TransactionRepository
 from app.models.users import Merchant
 from app.schemas import TransactionCreateSchema, TransactionProcessSchema
 from app.utils.aes import decrypt
 from app.utils.decorators import parse_with, HasApiKey
-import tasks
-import logging
-
 from app.utils.genrators import add_leading_zero
 
 logger = logging.getLogger(__name__)
 
-RESERVATION_TIME = 915 # 15 minutes and 15 seconds
+RESERVATION_TIME = 915  # 15 minutes and 15 seconds
 
 tn = api_V1.namespace('transaction', description='Transaction operations')
 
-# date  model
-date_model = tn.model('Expiration date', {
+ExpirationDate = tn.model('ExpirationDate', {
     'month': fields.Integer(example=10),
     "year": fields.Integer(example=2023),
 })
 
-credit_card_model = tn.model('Credit Card', {
+CreditCard = tn.model('CreditCard', {
     'first_name': fields.String(required=True, example="John"),
     'last_name': fields.String(required=True, example="Doe"),
     'number': fields.Integer(required=True, example=4551464693977947),
     'cvv': fields.String(required=True, example="765"),
-    'exp': fields.Nested(date_model),
+    'exp': fields.Nested(ExpirationDate),
 })
 
-merchant_model = tn.model("Merchant", {
-    'name': fields.String(required=True, example="Simons"),
-    'id': fields.String(required=True, example="D84D0C669C3C48779A217CD7C7EC00CC"),
-})
-
-transaction_model = tn.model('Transactions', {
+CreateTransactionRequest = tn.model('CreateTransactionRequest', {
     MERCHANT_API_KEY: fields.String(required=True, example="12345"),
     'amount': fields.Float(min=0, required=True, example=100.42),
     'purchase_desc': fields.String(required=True, example="PURCHASE/ Simons "),
-    'credit_card': fields.Nested(credit_card_model),
+    'credit_card': fields.Nested(CreditCard),
 })
 
-# Model for transaction cancellation
-cancellation_model = tn.model('Transaction cancellation', {
-    'transaction_number': fields.String(required=True, example="1234567890"),
-    MERCHANT_API_KEY: fields.String(required=True, example="98765431235465"),
-})
-
-# Model for transaction confirmation
-ProcessTransaction = tn.model('Transaction process', {
-    'transaction_number': fields.String(required=True, example="1234567890"),
-    "action": fields.String(description='Action', enum=[COMMIT_TRANS, CANCEL_TRANS]),
-    MERCHANT_API_KEY: fields.String(required=True, example="98765431235465"),
-})
-
-# transaction success model
-success_transaction_modal = tn.model('Sucessful transaction', {
+CreateTransactionReply = tn.model('CreateTransactionReply', {
     'transaction_number': fields.String(example="3330382145"),
-    "result": fields.String(example=SUCCESS),
+    "result": fields.String(example=ACCEPTED, enum=[ACCEPTED, DECLINED]),
+})
+
+ProcessTransactionRequest = tn.model('ProcessTransactionRequest', {
+    'transaction_number': fields.String(required=True, example="1234567890"),
+    "action": fields.String(description='Action', enum=[COMMIT, CANCEL]),
+    MERCHANT_API_KEY: fields.String(required=True, example="98765431235465"),
+})
+ProcessTransactionReply = tn.model('ProcessTransactionReply', {
+    "result": fields.String(example=COMMITTED, enum=[COMMITTED, CANCELLED]),
 })
 
 api_parser = reqparse.RequestParser()
@@ -77,10 +65,11 @@ class TransactionResourceCreate(Resource):
     Endpoint for singular transaction
     """
 
-    @tn.expect(transaction_model)
-    @tn.response(200, SUCCESS, success_transaction_modal)
+    @tn.expect(CreateTransactionRequest)
+    @tn.response(200, SUCCESS, CreateTransactionReply)
     @tn.response(400, INVALID_PAYLOAD)
     @tn.response(403, UNAUTHORIZED_ACCESS)
+    @tn.response(500, FAILURE)
     @HasApiKey(api_parser)
     @parse_with(TransactionCreateSchema(strict=True), arg_name="transaction")
     def post(self, **kwargs):
@@ -119,27 +108,38 @@ class TransactionResourceCreate(Resource):
                     status_code, resp_data = call_real_bank(bank_id, act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
                 if status_code == 200:
-                    transaction.encrypt_data()
-                    transaction.set_bank_trans_id(resp_data["transactionId"])
-                    TransactionRepository.create(transaction=transaction)
-                    cancel_transaction_timer(transaction.id)
-                    return prepare_response(jsonify({"result": SUCCESS, "transaction_number": transaction.id}), 200)
+                    if resp_data["result"] == ACCEPTED:
+                        transaction.encrypt_data()
+                        transaction.set_bank_trans_id(resp_data["transactionId"])
+                        TransactionRepository.create(transaction=transaction)
+                        cancel_transaction_timer(transaction.id)
+                        logger.info("Transaction {} was accepted".format(transaction.id))
+
+                        return prepare_response(jsonify({"result": ACCEPTED, "transaction_number": transaction.id}),
+                                                200)
+                    elif resp_data["result"] == DECLINED or resp_data["result"] == DECLINED_NO_FUNDS:
+                        logger.info("Transaction {} was declined".format(transaction.id))
+
+                        return prepare_response(jsonify({"result": DECLINED, "transaction_number": None}), 200)
+
 
             else:
                 logger.info("Transaction invalid")
-                return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
+                return prepare_response(jsonify({"result": FAILURE}), 500)
         except ValueError as e:
             logger.error("ValueError error occured. {}".format(str(e)))
-            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
+            return prepare_response(jsonify({"result": FAILURE}), 500)
 
         except Exception as e:
             logger.error("Exception error occured. {}".format(str(e)))
-            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
+            return prepare_response(jsonify({"result": FAILURE}), 500)
 
-        return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
+        return prepare_response(jsonify({"result": FAILURE}), 500)
 
 
 processed_transaction = "processed_transaction"
+
+
 @tn.route("/process")
 class TransactionResourceConfirmation(Resource):
     """
@@ -147,11 +147,12 @@ class TransactionResourceConfirmation(Resource):
     """
 
     @HasApiKey(api_parser)
-    @tn.expect(ProcessTransaction)
-    @tn.response(200, SUCCESS)
+    @tn.expect(ProcessTransactionRequest)
+    @tn.response(200, SUCCESS, ProcessTransactionReply)
     @tn.response(400, INVALID_PAYLOAD)
     @tn.response(403, UNAUTHORIZED_ACCESS)
-    @parse_with(TransactionProcessSchema(strict=True),arg_name=processed_transaction)
+    @tn.response(500, FAILURE)
+    @parse_with(TransactionProcessSchema(strict=True), arg_name=processed_transaction)
     def post(self, **kwargs):
         try:
             api_key = kwargs[MERCHANT_API_KEY]
@@ -162,7 +163,7 @@ class TransactionResourceConfirmation(Resource):
             merchant = Merchant.query.filter_by(api_key=api_key).first()
 
             if transaction is not None and \
-                    merchant is not None and\
+                    merchant is not None and \
                     transaction.status == PENDING and \
                     merchant.status == "active":
 
@@ -178,28 +179,28 @@ class TransactionResourceConfirmation(Resource):
 
                 if status_code == 200 or status_code == 201:
 
-                    if action == CANCEL_TRANS and resp_data["result"] == CANCELLED:
+                    if action == CANCEL and resp_data["result"] == CANCELLED:
                         transaction.cancel()
                         logger.info("Transaction {} was canceled".format(transaction.id))
-
-                    elif action == COMMIT_TRANS and resp_data["result"] == COMMITTED:
+                        resp_result = CANCELLED
+                    elif action == COMMIT and resp_data["result"] == COMMITTED:
                         transaction.authorize()
                         logger.info("Transaction {} was authorized".format(transaction.id))
+                        resp_result = COMMITTED
 
                     TransactionRepository.update(transaction)
 
-                    return prepare_response(jsonify({"result": SUCCESS}), 200)
+                    return prepare_response(jsonify({"result": resp_result}), 200)
 
             logger.error("Process failed")
-            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
+            return prepare_response(jsonify({"result": FAILURE}), 500)
 
         except ValueError as e:
             logger.error("ValueError error occured. message={}".format(str(e)))
-            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
+            return prepare_response(jsonify({"result": FAILURE}), 500)
         except Exception as e:
             logger.error("Exception error occured. message={}".format(str(e)))
-            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
-
+            return prepare_response(jsonify({"result": FAILURE}), 500)
 
 
 def cancel_transaction_timer(trans_num):
@@ -209,7 +210,6 @@ def cancel_transaction_timer(trans_num):
     """
 
     def func(**kwargs):
-
         if kwargs["trans_num"]:
             logger.info("Canceling transaction {}".format(trans_num))
 
@@ -224,4 +224,3 @@ def prepare_response(data, code):
     response = data
     response.status_code = code
     return response
-
