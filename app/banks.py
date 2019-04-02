@@ -40,7 +40,9 @@ def call_real_bank(bank_id, act=None, **kwargs):
         parsed_res = jjson.loads(jjson.dumps(results))
         logger.info("Response data: {}".format(jjson.dumps(parsed_res, indent=4, sort_keys=True)))
 
-        if COMMITTED in results.values() or ACCEPTED in results.values():
+        if COMMITTED in results.values() or\
+                ACCEPTED in results.values() or \
+                CANCELLED in results.values():
             return response.status_code, results
 
     except requests.HTTPError as e:
