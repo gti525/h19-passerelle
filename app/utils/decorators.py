@@ -58,14 +58,14 @@ def parse_with(schema, arg_name='entity', **kwargs):
 
             except ValidationError as e:
                 logger.error("parse_with: {}".format(str(e)))
-                abort(400, INVALID)
+                abort(400, INVALID_PAYLOAD)
                 logger.error("parse_with: {}".format(str(e)))
             except ValueError as e:
                 logger.error("parse_with: {}".format(str(e)))
-                abort(400, INVALID)
+                abort(400, INVALID_PAYLOAD)
             except Exception as e:
                 logger.error("parse_with: {}".format(str(e)))
-                abort(400, INVALID)
+                abort(400, INVALID_PAYLOAD)
 
             fkwargs.update({arg_name: entity, MERCHANT_API_KEY: entity[MERCHANT_API_KEY]})
             return f(*fargs, **fkwargs)
@@ -82,7 +82,7 @@ def HasApiKey(parser):
             args = parser.parse_args()
             if args[MERCHANT_API_KEY]:
                 return f(*fargs, **fkwargs)
-            abort(403, message=UNAUTHORIZED_ACCESS)
+            abort(401, message=UNAUTHORIZED_ACCESS)
             logger.error("HasApiKey: MERCHANT_API_KEY missing")
 
         return inner

@@ -1,5 +1,6 @@
-import logging
 import json as jjson
+import logging
+
 import requests
 
 from app.consts import *
@@ -18,7 +19,7 @@ PROCESS_TRANS_ACTION = "PROCESS_ACTION"
 
 def call_real_bank(bank_id, act=None, **kwargs):
     response = None
-    logger.info("ACTION = {} to BANK = {}".format(act,bank_id))
+    logger.info("ACTION = {} to BANK = {}".format(act, bank_id))
 
     if act == PRE_AUTHORIZE_TRANS_ACTION:
         if bank_id == BANK2_ID:
@@ -40,30 +41,39 @@ def call_real_bank(bank_id, act=None, **kwargs):
         parsed_res = jjson.loads(jjson.dumps(results))
         logger.info("Response data: {}".format(jjson.dumps(parsed_res, indent=4, sort_keys=True)))
 
-        if COMMITTED in results.values() or\
-                ACCEPTED in results.values() or \
-                CANCELLED in results.values():
-            return response.status_code, results
+        return response.status_code, results
 
     except requests.HTTPError as e:
         logger.error("HTTPError status-code={}  message={}".format(response.status_code, str(e)))
+        if DECLINED in response.json().values():
+            return 200, response.json()
+        return response.status_code, {}
+    except ValueError as e:
+        logger.error("ValueError: {}".format(str(e)))
         return response.status_code, {}
     except Exception as e:
         logger.error("Exception: {}".format(str(e)))
         return response.status_code, {}
 
-    return 400, {}
-
 
 def call_fake_bank(act=None, **kwargs):
+    logger.info("ACTION = {} to BANK = {}".format(act, BANKX_ID))
+
     code = 200
-    resp_data = {}
+    resp_data = {
+        "result": ACCEPTED
+    }
 
     try:
         if act == PRE_AUTHORIZE_TRANS_ACTION:
             resp_data["transactionId"] = genrators.random_with_N_digits(12)
+            resp_data["result"] = ACCEPTED
         elif act == PROCESS_TRANS_ACTION:
-            pass
+            if kwargs["action"] == COMMIT:
+                resp_data["result"] = COMMITTED
+            elif kwargs["action"] == CANCEL:
+                resp_data["result"] = CANCELLED
+
         return code, resp_data
     except Exception as e:
         logger.error("Exception message={}".format(str(e)))
@@ -172,4 +182,3 @@ def log_data(response, data):
     logger.info("Data: {}".format(jjson.dumps(parsed_data, indent=4, sort_keys=True)))
     parsed_text = jjson.loads(jjson.dumps(response.text))
     logger.info("Parsed text: {}".format(jjson.dumps(parsed_text, indent=4, sort_keys=True)))
-
