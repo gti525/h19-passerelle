@@ -79,7 +79,7 @@ class TransactionResourceCreate(Resource):
 
     @tn.expect(transaction_model)
     @tn.response(200, SUCCESS, success_transaction_modal)
-    @tn.response(400, INVALID)
+    @tn.response(400, INVALID_PAYLOAD)
     @tn.response(403, UNAUTHORIZED_ACCESS)
     @HasApiKey(api_parser)
     @parse_with(TransactionCreateSchema(strict=True), arg_name="transaction")
@@ -119,7 +119,6 @@ class TransactionResourceCreate(Resource):
                     status_code, resp_data = call_real_bank(bank_id, act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
                 if status_code == 200:
-
                     transaction.encrypt_data()
                     transaction.set_bank_trans_id(resp_data["transactionId"])
                     TransactionRepository.create(transaction=transaction)
@@ -128,16 +127,16 @@ class TransactionResourceCreate(Resource):
 
             else:
                 logger.info("Transaction invalid")
-                return prepare_response(jsonify({"result": INVALID}), 400)
+                return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
         except ValueError as e:
             logger.error("ValueError error occured. {}".format(str(e)))
-            return prepare_response(jsonify({"result": INVALID}), 400)
+            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
         except Exception as e:
             logger.error("Exception error occured. {}".format(str(e)))
-            return prepare_response(jsonify({"result": INVALID}), 400)
+            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
-        return prepare_response(jsonify({"result": INVALID}), 400)
+        return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
 
 processed_transaction = "processed_transaction"
@@ -150,7 +149,7 @@ class TransactionResourceConfirmation(Resource):
     @HasApiKey(api_parser)
     @tn.expect(ProcessTransaction)
     @tn.response(200, SUCCESS)
-    @tn.response(400, INVALID)
+    @tn.response(400, INVALID_PAYLOAD)
     @tn.response(403, UNAUTHORIZED_ACCESS)
     @parse_with(TransactionProcessSchema(strict=True),arg_name=processed_transaction)
     def post(self, **kwargs):
@@ -181,22 +180,25 @@ class TransactionResourceConfirmation(Resource):
 
                     if action == CANCEL_TRANS and resp_data["result"] == CANCELLED:
                         transaction.cancel()
+                        logger.info("Transaction {} was canceled".format(transaction.id))
+
                     elif action == COMMIT_TRANS and resp_data["result"] == COMMITTED:
                         transaction.authorize()
+                        logger.info("Transaction {} was authorized".format(transaction.id))
 
                     TransactionRepository.update(transaction)
 
                     return prepare_response(jsonify({"result": SUCCESS}), 200)
 
-            logger.error("Confirmation invalid")
-            return prepare_response(jsonify({"result": INVALID}), 400)
+            logger.error("Process failed")
+            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
         except ValueError as e:
             logger.error("ValueError error occured. message={}".format(str(e)))
-            return prepare_response(jsonify({"result": INVALID}), 400)
+            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
         except Exception as e:
             logger.error("Exception error occured. message={}".format(str(e)))
-            return prepare_response(jsonify({"result": INVALID}), 400)
+            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
 
 
