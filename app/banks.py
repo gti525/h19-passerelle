@@ -1,5 +1,6 @@
-import logging
 import json as jjson
+import logging
+
 import requests
 
 from app.consts import *
@@ -56,14 +57,23 @@ def call_real_bank(bank_id, act=None, **kwargs):
 
 
 def call_fake_bank(act=None, **kwargs):
+    logger.info("ACTION = {} to BANK = {}".format(act, BANKX_ID))
+
     code = 200
-    resp_data = {}
+    resp_data = {
+        "result": ACCEPTED
+    }
 
     try:
         if act == PRE_AUTHORIZE_TRANS_ACTION:
             resp_data["transactionId"] = genrators.random_with_N_digits(12)
+            resp_data["result"] = ACCEPTED
         elif act == PROCESS_TRANS_ACTION:
-            pass
+            if kwargs["action"] == COMMIT:
+                resp_data["result"] = COMMITTED
+            elif kwargs["action"] == CANCEL:
+                resp_data["result"] = CANCELLED
+
         return code, resp_data
     except Exception as e:
         logger.error("Exception message={}".format(str(e)))
