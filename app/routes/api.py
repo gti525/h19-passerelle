@@ -18,7 +18,7 @@ from app.utils.genrators import add_leading_zero
 
 logger = logging.getLogger(__name__)
 
-RESERVATION_TIME = 960  # 16 minutes in seconds. just in case...
+RESERVATION_TIME = 915 # 15 minutes and 15 seconds
 
 tn = api_V1.namespace('transaction', description='Transaction operations')
 
@@ -119,6 +119,7 @@ class TransactionResourceCreate(Resource):
                     status_code, resp_data = call_real_bank(bank_id, act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
                 if status_code == 200:
+
                     transaction.encrypt_data()
                     transaction.set_bank_trans_id(resp_data["transactionId"])
                     TransactionRepository.create(transaction=transaction)
@@ -161,7 +162,11 @@ class TransactionResourceConfirmation(Resource):
             transaction = Transaction.query.get(transaction_number)
             merchant = Merchant.query.filter_by(api_key=api_key).first()
 
-            if transaction is not None and merchant is not None and transaction.status == PENDING:
+            if transaction is not None and \
+                    merchant is not None and\
+                    transaction.status == PENDING and \
+                    merchant.status == "active":
+
                 card_number = decrypt(transaction.credit_card_number)
                 bank_id = get_bank_id(card_number)
                 trans_data = {"bank_transaction_id": transaction.bank_transaction_id, "action": action}
@@ -174,9 +179,9 @@ class TransactionResourceConfirmation(Resource):
 
                 if status_code == 200 or status_code == 201:
 
-                    if action == CANCEL_TRANS:
+                    if action == CANCEL_TRANS and resp_data["result"] == CANCELLED:
                         transaction.cancel()
-                    elif action == COMMIT_TRANS:
+                    elif action == COMMIT_TRANS and resp_data["result"] == COMMITTED:
                         transaction.authorize()
 
                     TransactionRepository.update(transaction)
