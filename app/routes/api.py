@@ -68,7 +68,7 @@ class TransactionResourceCreate(Resource):
     @tn.expect(CreateTransactionRequest)
     @tn.response(200, SUCCESS, CreateTransactionReply)
     @tn.response(400, INVALID_PAYLOAD)
-    @tn.response(403, UNAUTHORIZED_ACCESS)
+    @tn.response(401, UNAUTHORIZED_ACCESS)
     @tn.response(500, FAILURE)
     @HasApiKey(api_parser)
     @parse_with(TransactionCreateSchema(strict=True), arg_name="transaction")
@@ -150,7 +150,7 @@ class TransactionResourceConfirmation(Resource):
     @tn.expect(ProcessTransactionRequest)
     @tn.response(200, SUCCESS, ProcessTransactionReply)
     @tn.response(400, INVALID_PAYLOAD)
-    @tn.response(403, UNAUTHORIZED_ACCESS)
+    @tn.response(401, UNAUTHORIZED_ACCESS)
     @tn.response(500, FAILURE)
     @parse_with(TransactionProcessSchema(strict=True), arg_name=processed_transaction)
     def post(self, **kwargs):
