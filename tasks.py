@@ -31,7 +31,7 @@ def cancel_transaction(transaction_id=None):
     try:
         cur.execute(
             """UPDATE transaction set status = (CASE WHEN current_date > created + (15 ||' minutes')::interval THEN 
-            'Canceled' ELSE 'Pending' END) WHERE id={} AND status = 'PENNDING' ;""".format(transaction_id))
+            'Canceled' ELSE 'Pending' END) WHERE id={} AND status = 'Pending' ;""".format(transaction_id))
         conn.commit()
         cur.close()
         rowcount = cur.rowcount
