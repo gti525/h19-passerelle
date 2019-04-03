@@ -7,7 +7,7 @@ import tasks
 from app import api_V1
 from app.banks import *
 from app.consts import *
-from app.models.transactions import Transaction, PENDING, TransactionRepository
+from app.models.transactions import *
 from app.models.users import Merchant
 from app.schemas import TransactionCreateSchema, TransactionProcessSchema
 from app.utils.aes import decrypt
@@ -77,57 +77,51 @@ class TransactionResourceCreate(Resource):
         amount = kwargs["transaction"]["amount"]
         transaction = Transaction(credit_card=credit_card, label=label, amount=amount)
         merchant_api_key = kwargs[MERCHANT_API_KEY]
-        transaction_valid = True
 
         try:
             # Validate API KEY
             merchant = Merchant.query.filter_by(api_key=merchant_api_key).first()
 
             if merchant is None:
-                transaction_valid = False
-                logger.info("Merchant doesnt exist")
+                logger.info("Merchant with API-KEY '{}' doesnt exist".format(merchant_api_key))
+                return prepare_response(jsonify({"result": UNAUTHORIZED_ACCESS}), 401)
 
-            if transaction_valid:
+            transaction.set_merchant(merchant)
+            bank_id = get_bank_id(transaction.credit_card_number)
+            trans_data = {
+                "card_holder_name": "{} {}".format(transaction.first_name, transaction.last_name),
+                "amount": transaction.amount,
+                "merchant": merchant,
+                "card_number": transaction.credit_card_number,
+                "cvv": transaction.cvv,
+                "month_exp": add_leading_zero(transaction.exp_month),
+                "year_exp": transaction.exp_year
+            }
 
-                transaction.set_merchant(merchant)
-                bank_id = get_bank_id(transaction.credit_card_number)
-                trans_data = {
-                    "card_holder_name": "{} {}".format(transaction.first_name, transaction.last_name),
-                    "amount": transaction.amount,
-                    "merchant": merchant,
-                    "card_number": transaction.credit_card_number,
-                    "cvv": transaction.cvv,
-                    "month_exp": add_leading_zero(transaction.exp_month),
-                    "year_exp": transaction.exp_year
-                }
-
-                if bank_id == BANKX_ID:
-                    status_code, resp_data = call_fake_bank(act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
-                else:
-                    status_code, resp_data = call_real_bank(bank_id, act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
-
-                if status_code == 200:
-                    transaction.encrypt_data()
-
-                    if resp_data["result"] == ACCEPTED:
-                        transaction.set_bank_trans_id(resp_data["transactionId"])
-                        TransactionRepository.create(transaction=transaction)
-                        cancel_transaction_timer(transaction.id)
-                        logger.info("Transaction {} was accepted".format(transaction.id))
-                        return prepare_response(jsonify({"result": ACCEPTED, "transaction_number": transaction.id}),
-                                                200)
-                    elif resp_data["result"] == DECLINED or resp_data["result"] == DECLINED_NO_FUNDS:
-                        transaction.refuse()
-                        TransactionRepository.create(transaction=transaction)
-
-                        logger.info("Transaction {} was declined".format(transaction.id))
-                        return prepare_response(jsonify({"result": DECLINED, "transaction_number": None}), 200)
-
-
-
+            if bank_id == BANKX_ID:
+                status_code, resp_data = call_fake_bank(act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
             else:
-                logger.info("Transaction invalid")
-                return prepare_response(jsonify({"result": FAILURE}), 500)
+                status_code, resp_data = call_real_bank(bank_id, act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
+
+            if status_code == 200:
+                transaction.encrypt_data()
+
+                if resp_data["result"] == ACCEPTED:
+                    transaction.set_bank_trans_id(resp_data["transactionId"])
+                    TransactionRepository.create(transaction=transaction)
+                    cancel_transaction_timer(transaction.id)
+                    logger.info("Transaction {} was accepted".format(transaction.id))
+                    return prepare_response(jsonify({"result": ACCEPTED, "transaction_number": transaction.id}),
+                                            200)
+                elif resp_data["result"] == DECLINED or resp_data["result"] == DECLINED_NO_FUNDS:
+                    transaction.refuse()
+                    TransactionRepository.create(transaction=transaction)
+
+                    logger.info("Transaction {} was declined".format(transaction.id))
+                    return prepare_response(jsonify({"result": DECLINED, "transaction_number": None}), 200)
+            else:
+                logger.info("Something went wrong. transaction couldn't be processed")
+                return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
         except ValueError as e:
             logger.error("ValueError error occured. {}".format(str(e)))
             return prepare_response(jsonify({"result": FAILURE}), 500)
@@ -164,11 +158,21 @@ class TransactionResourceConfirmation(Resource):
             transaction = Transaction.query.get(transaction_number)
             merchant = Merchant.query.filter_by(api_key=api_key).first()
 
-            if transaction is not None and \
-                    merchant is not None and \
-                    transaction.status == PENDING and \
-                    merchant.status == "active":
+            if transaction is None:
+                logger.info("Transaction '{}' was not found".format(transaction_number))
+                return prepare_response(jsonify({"result": INVALID_PAYLOAD_TRANSACTION}), 400)
 
+            elif merchant is None or merchant.status != 'active':
+                logger.info("Merchant with API-KEY '{}' doesnt exist".format(api_key))
+                return prepare_response(jsonify({"result": UNAUTHORIZED_ACCESS}), 401)
+
+            elif transaction.status == AUTHORIZED or \
+                    transaction.status == CANCELLED or \
+                    transaction.status == REFUSED:
+                logger.info("Transaction '{}' was already {}".format(transaction_number, transaction.status))
+                return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
+
+            elif transaction.status == PENDING:
                 card_number = decrypt(transaction.credit_card_number)
                 bank_id = get_bank_id(card_number)
                 trans_data = {"bank_transaction_id": transaction.bank_transaction_id, "action": action}
@@ -185,23 +189,22 @@ class TransactionResourceConfirmation(Resource):
 
                     if action == CANCEL and resp_data["result"] == CANCELLED:
                         transaction.cancel()
-                        logger.info("Transaction {} was canceled".format(transaction.id))
+                        logger.info("Transaction '{}' was canceled".format(transaction.id))
                         resp_result = CANCELLED
                     elif action == COMMIT and resp_data["result"] == COMMITTED:
                         transaction.authorize()
-                        logger.info("Transaction {} was authorized".format(transaction.id))
+                        logger.info("Transaction '{}' was authorized".format(transaction.id))
                         resp_result = COMMITTED
                     elif resp_data["result"] == STATUS_DECLINED_BY_3RD_PARTY_BANK:
                         resp_result = CANCELLED_CONTACT_BANK
                         transaction.refuse()
-                        logger.info("Transaction {} was was refused by 3rd party bank".format(transaction.id))
+                        logger.info("Transaction '{}' was was refused by 3rd party bank".format(transaction.id))
 
                     TransactionRepository.update(transaction)
 
                     return prepare_response(jsonify({"result": resp_result}), 200)
 
-            logger.error("Process failed")
-            return prepare_response(jsonify({"result": FAILURE}), 500)
+            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
         except ValueError as e:
             logger.error("ValueError error occured. message={}".format(str(e)))
