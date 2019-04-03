@@ -1,4 +1,3 @@
-import logging
 from threading import Timer
 
 from flask import jsonify
@@ -108,19 +107,22 @@ class TransactionResourceCreate(Resource):
                     status_code, resp_data = call_real_bank(bank_id, act=PRE_AUTHORIZE_TRANS_ACTION, **trans_data)
 
                 if status_code == 200:
+                    transaction.encrypt_data()
+
                     if resp_data["result"] == ACCEPTED:
-                        transaction.encrypt_data()
                         transaction.set_bank_trans_id(resp_data["transactionId"])
                         TransactionRepository.create(transaction=transaction)
                         cancel_transaction_timer(transaction.id)
                         logger.info("Transaction {} was accepted".format(transaction.id))
-
                         return prepare_response(jsonify({"result": ACCEPTED, "transaction_number": transaction.id}),
                                                 200)
                     elif resp_data["result"] == DECLINED or resp_data["result"] == DECLINED_NO_FUNDS:
-                        logger.info("Transaction {} was declined".format(transaction.id))
+                        transaction.refuse()
+                        TransactionRepository.create(transaction=transaction)
 
+                        logger.info("Transaction {} was declined".format(transaction.id))
                         return prepare_response(jsonify({"result": DECLINED, "transaction_number": None}), 200)
+
 
 
             else:
@@ -189,6 +191,10 @@ class TransactionResourceConfirmation(Resource):
                         transaction.authorize()
                         logger.info("Transaction {} was authorized".format(transaction.id))
                         resp_result = COMMITTED
+                    elif resp_data["result"] == STATUS_DECLINED_BY_3RD_PARTY_BANK:
+                        resp_result = CANCELLED_CONTACT_BANK
+                        transaction.refuse()
+                        logger.info("Transaction {} was was refused by 3rd party bank".format(transaction.id))
 
                     TransactionRepository.update(transaction)
 
