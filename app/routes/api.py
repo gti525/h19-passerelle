@@ -167,7 +167,7 @@ class TransactionResourceConfirmation(Resource):
                 return prepare_response(jsonify({"result": UNAUTHORIZED_ACCESS}), 401)
 
             elif transaction.status == AUTHORIZED or \
-                    transaction.status == CANCELLED or \
+                    transaction.status == CANCELED or \
                     transaction.status == REFUSED:
                 logger.info("Transaction '{}' was already {}".format(transaction_number, transaction.status))
                 return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
