@@ -46,6 +46,8 @@ def call_real_bank(bank_id, act=None, **kwargs):
     except requests.HTTPError as e:
         logger.error("HTTPError status-code={}  message={}".format(response.status_code, str(e)))
         if DECLINED in response.json().values():
+            logger.info("DECLINED")
+
             return 200, response.json()
         return response.status_code, {}
     except ValueError as e:

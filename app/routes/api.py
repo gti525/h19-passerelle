@@ -68,7 +68,6 @@ class TransactionResourceCreate(Resource):
     @tn.response(200, SUCCESS, CreateTransactionReply)
     @tn.response(400, INVALID_PAYLOAD)
     @tn.response(401, UNAUTHORIZED_ACCESS)
-    @tn.response(500, FAILURE)
     @HasApiKey(api_parser)
     @parse_with(TransactionCreateSchema(strict=True), arg_name="transaction")
     def post(self, **kwargs):
@@ -124,13 +123,13 @@ class TransactionResourceCreate(Resource):
                 return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
         except ValueError as e:
             logger.error("ValueError error occured. {}".format(str(e)))
-            return prepare_response(jsonify({"result": FAILURE}), 500)
+            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
         except Exception as e:
             logger.error("Exception error occured. {}".format(str(e)))
-            return prepare_response(jsonify({"result": FAILURE}), 500)
+            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
-        return prepare_response(jsonify({"result": FAILURE}), 500)
+        return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
 
 processed_transaction = "processed_transaction"
@@ -147,7 +146,6 @@ class TransactionResourceConfirmation(Resource):
     @tn.response(200, SUCCESS, ProcessTransactionReply)
     @tn.response(400, INVALID_PAYLOAD)
     @tn.response(401, UNAUTHORIZED_ACCESS)
-    @tn.response(500, FAILURE)
     @parse_with(TransactionProcessSchema(strict=True), arg_name=processed_transaction)
     def post(self, **kwargs):
         try:
@@ -208,10 +206,10 @@ class TransactionResourceConfirmation(Resource):
 
         except ValueError as e:
             logger.error("ValueError error occured. message={}".format(str(e)))
-            return prepare_response(jsonify({"result": FAILURE}), 500)
+            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
         except Exception as e:
             logger.error("Exception error occured. message={}".format(str(e)))
-            return prepare_response(jsonify({"result": FAILURE}), 500)
+            return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
 
 def cancel_transaction_timer(trans_num):
