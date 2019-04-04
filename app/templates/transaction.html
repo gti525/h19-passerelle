@@ -115,6 +115,7 @@
                             {%if type == 'admin' %}<th>Vendeur</th>{% endif %}
                             <th>Nom</th>
                             <th>Prénom</th>
+                            <th>4 derniers chiffres</th>
                             <th>Montant</th>
                             <th>Description</th>
                             <th>Date</th>
@@ -126,6 +127,7 @@
                             {%if type == 'admin' %}<td>{{ merchants[transaction.merchant_id] }}</td>{% endif %}
                             <td>{{transaction.last_name}}</td>
                             <td>{{transaction.first_name}}</td>
+                            <td>{{ last_4_digits(transaction.credit_card_number) }}</td>
                             <td>${{ "{:,.2f}".format(transaction.amount)}}</td>
                             <td>{{transaction.label}}</td>
                             <td>{{ transaction.created.strftime('%Y-%m-%d %H:%M:%S') }}</td>

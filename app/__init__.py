@@ -8,6 +8,7 @@ from flask_restplus import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
 from flask_login import LoginManager
+from .utils.aes import decrypt
 
 
 dictConfig({
@@ -86,5 +87,10 @@ def create_app(config=None):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(user_id)
+
+    def last_4_digits(card):
+        return str(decrypt(card))[-4:]
+
+    app.jinja_env.globals.update(last_4_digits=last_4_digits)
 
     return app
