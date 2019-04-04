@@ -84,7 +84,7 @@ def call_fake_bank(act=None, **kwargs):
 
 class Bank:
     @staticmethod
-    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
+    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp,desc):
         pass
 
     @staticmethod
@@ -94,12 +94,12 @@ class Bank:
 
 class Bank2(Bank):
     @staticmethod
-    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
+    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp,desc):
         url = BANK2_BASE_URL + "/api/v1/paymentGateway/preAuth"
         headers = {"X-API-KEY": "15489123311"}
         data = {
             "amount": amount,
-            "merchantDesc": merchant.name,
+            "merchantDesc": format_descrition(merchant.name,desc),
             "merchantAccountNumber": int(merchant.account_number),
             "account": {
                 "cardholderName": card_holder_name,
@@ -129,13 +129,9 @@ class Bank2(Bank):
 
 class Bank1(Bank):
     @staticmethod
-    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp):
+    def pre_authorize_transaction(card_holder_name, amount, merchant, card_number, cvv, month_exp, year_exp,desc):
         url = BANK1_BASE_URL + "/api/paymentgateway/preauth"
-        descBank1 = ''
-        if amount >= 0:
-            descBank1 = 'Achat chez ' + merchant.name
-        else:
-            descBank1 = 'Remboursement en provenance de ' + merchant.name
+
         cHolderNames = card_holder_name.split()
         headers = {"apikey": "FyufTW2r!"}
         data = {
@@ -146,7 +142,7 @@ class Bank1(Bank):
             "cvv": int(cvv),
             "expiryDate": "{}/{}".format(month_exp, year_exp),
             "amount": str(amount),
-            "transactionDesc": descBank1
+            "transactionDesc": format_descrition(merchant.name,desc)
         }
         r = requests.post(url, headers=headers, json=data)
         log_data(r, data)
@@ -184,3 +180,7 @@ def log_data(response, data):
     logger.info("Data: {}".format(jjson.dumps(parsed_data, indent=4, sort_keys=True)))
     parsed_text = jjson.loads(jjson.dumps(response.text))
     logger.info("Parsed text: {}".format(jjson.dumps(parsed_text, indent=4, sort_keys=True)))
+
+
+def format_descrition(name, desc):
+    return "{}/ {}".format(name,desc)

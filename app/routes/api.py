@@ -94,7 +94,8 @@ class TransactionResourceCreate(Resource):
                 "card_number": transaction.credit_card_number,
                 "cvv": transaction.cvv,
                 "month_exp": add_leading_zero(transaction.exp_month),
-                "year_exp": transaction.exp_year
+                "year_exp": transaction.exp_year,
+                "desc": transaction.label
             }
 
             if bank_id == BANKX_ID:
@@ -124,10 +125,10 @@ class TransactionResourceCreate(Resource):
         except ValueError as e:
             logger.error("ValueError error occured. {}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
-
         except Exception as e:
             logger.error("Exception error occured. {}".format(str(e)))
             return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
+
 
         return prepare_response(jsonify({"result": INVALID_PAYLOAD}), 400)
 
