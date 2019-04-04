@@ -16,13 +16,24 @@ def transaction():
     if current_user.is_authenticated:
         if current_user.type == 'admin':
             transactions = Transaction.query.all()
+            recentTransactions = []
+            for x in range(0, 4):
+                d = date.today() - timedelta(x)
+                recentTransactions.append(
+                    Transaction.query.filter(Transaction.created >= d, Transaction.created < d + timedelta(1)).count())
         else:
             transactions = Transaction.query.filter_by(merchant_id=current_user.id)
+            recentTransactions = []
+            for x in range(0, 4):
+                d = date.today() - timedelta(x)
+                recentTransactions.append(
+                    Transaction.query.filter(Transaction.created >= d, Transaction.created < d + timedelta(1),Transaction.merchant_id==current_user.id).count())
 
-        recentTransactions = []
-        for x in range(0, 4):
-            d = date.today() - timedelta(x)
-            recentTransactions.append(Transaction.query.filter(Transaction.created >= d, Transaction.created < d + timedelta(1)).count())
+        merchants = Merchant.query.all()
+        merchantId = {}
+        for merchant in merchants:
+            merchantId[merchant.id] = merchant.name
+
         transactionsByMerchant = {}
         merchant01 = Merchant.query.filter_by(name=vente01).first()
         merchant02 = Merchant.query.filter_by(name=vente02).first()
@@ -43,6 +54,6 @@ def transaction():
 
         return render_template("transaction.html", type=current_user.type, transactions=transactions,
                                recentTransactions=recentTransactions,
-                               transactionsByMerchant=transactionsByMerchant, transactionByStatus=transactionByStatus)
+                               transactionsByMerchant=transactionsByMerchant, transactionByStatus=transactionByStatus, merchants=merchantId)
     else:
         return redirect('login')
