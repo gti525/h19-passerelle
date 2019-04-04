@@ -62,6 +62,7 @@ def create_app(config=None):
     from app.routes.register import register_bp
     from app.routes.transaction import transaction_bp
     from app.routes.errors import page_not_found, page_error
+    from app.routes.base import base_bp
 
     from app.routes.api import tn
     api_V1.add_namespace(tn)
@@ -74,6 +75,7 @@ def create_app(config=None):
     app.register_blueprint(userModify_bp)
     app.register_blueprint(register_bp)
     app.register_blueprint(transaction_bp)
+    app.register_blueprint(base_bp)
 
     app.register_error_handler(500,page_error)
     app.register_error_handler(404,page_not_found)
