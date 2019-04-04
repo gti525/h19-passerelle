@@ -59,7 +59,7 @@ class CreditCardSchema(Schema):
 
     @validates("number")
     def validate_credit_card_number(self, value):
-        if not luhn.verify(str(value)):
+        if not luhn.verify(str(value)) or len(str(value)) != 16:
             logger.error("CreditCard number is invalid")
             raise ValidationError("CreditCard number is invalid")
 
